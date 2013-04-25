@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+$(function(){
+
+
+//返回数组最大值
+var getMax = function(a){
+  return Math.max.apply(Math,a);
+}
+
+/********数据初始化**********************************/
+  var _i = 0, //统计加载图片数量
+      row_n = 3, //每行默认3张图片
+      window_w = $(window).width(),
+      imgw = (window_w-18)*0.33,
+      imgh = imgw/4*3,
+      liveh = imgh*2+4,
+      p_max_num = 18, //paper 18/per request
+      l_t_border = 3.5, //图片左右上下边距
+      cate='{{stype}}', //种类:paper-壁纸,live-动态壁纸
+      key = '{{keyword}}', //关键词
+      skip = {ps:0,ls:0},
+      search = $('input[name="search"]'),
+      t_clear,
+      more,
+      loading,
+      p_box,
+      backTop,
+      h_box = [0,0,0] ; //每列图片的高度
+//初始化搜索框
+  search.width(window_w-20-74).val(key).show();
+/************************************************/
+
+//根据cate,skip返回相关url
+var getUrl = function(cate,key,skip){
+    return '/search'+cate+(cate==='all'?'?pskip='+skip['ps']+'&lskip='+skip['ls']:'?skip='+((cate==='paper')?skip['ps']:skip['ls']))+'&keyword='+key+'&jsoncallback=?&d='+Math.random();
+}
+
+//页面展示
+var showImage = function(images,cate){
+  var _pic = '' ;
+  p_box = p_box || $('#p_box');
+  $.each(images,function(i,j){
+       var _top = (_i<row_n-1)?0:h_box[_i%row_n]+Math.floor(_i/row_n)*l_t_border,
+           _left = (l_t_border+imgw)*(_i%row_n);
+       h_box[_i%row_n] += j.num==0&&imgh||liveh ; //叠加每列的图片的高
+
+     loading.hide();
+     if(j.num === 1){
+      _pic += '<div style="position:absolute;left:'+_left+'px;top:'+_top+'px;"><span style="position:absolute;right:9px;top:9px;padding:2px;background:rgba(0, 0, 0, 0.7);color:white;font-size:12px;">动态</span><a href="'+j.href+'"><img src="'+j.src+'" width="'+imgw+'" height="'+liveh+'"></a></div>' ;
+      skip['ls']++ ;
+     }
+     else{
+      _pic += '<div style="position:absolute;left:'+_left+'px;top:'+_top+'px;"><a href="'+j.href+'"><img src="'+j.src+'" width="'+imgw+'" height="'+imgh+'"></a></div>';
+     }
+     _i++ ;
+  });
+
+  $('<div class="pic_load" style="opacity: 0; visibility: hidden;"/>').appendTo(p_box).html(_pic).css({'opacity':'1','visibility':'visible'});
+
+  if(cate==='all'||cate==='paper'){ 
+      skip['ps']+=p_max_num;
+  }
+  return true ;
+}
+
+//根据cate:种类,key:关键词,skip:位置 ini:页面是否刷新 读取相关图片
+var loadImage = function(cate,key,skip,showImage,ini){
+  var url = getUrl(cate,key,skip);
+  loading = loading || $('.loading');
+  more = more || $('.more');
+  backTop = backTop || $('.backTop');
+  //获取图片对象
+ $.ajax({   
+     url:url,  
+     dataType:'jsonp',  
+     jsonp:'callback',  
+     timeout:10000,
+     success:function(data){
+       var max_h = 0;
+       if(data.resp.length>0){
+         if(showImage(data.resp,cate)){
+           max_h = getMax(h_box);
+           if(data.isMore === 1){
+             more.css('top',max_h+Math.floor(_i/row_n)*3.5+'px').addClass('loadmore2').html('点击加载更多').show();
+           }else{
+             more.css('top',max_h+Math.floor(_i/row_n)*3.5+'px').removeClass('loadmore2').addClass('nomore').html('没有更多啦!').show();
+           }
+             backTop.css('top',max_h+Math.floor(_i/row_n)*3.5+'px').show();
+         }
+      }
+      else{
+        loading.hide();
+        more.css('top',max_h+Math.floor(_i/row_n)*3.5+'px').addClass('nopaper').html('没有找到相关壁纸').show();
+      }
+   },
+   error:function(){
+     if(ini){
+       loading.hide().html('网络异常,再试一次').show();
+     }
+     else{
+       more.html('网络异常，再试一次');
+     }
+   }
+  });
+}
+
+/***************初始化页面****************/
+var p_clear = function(){
+    skip = {ps:0,ls:0} ; 
+    h_box = [0,0,0] ;
+    _i = 0 ;
+    p_box.html('') ;
+    more.attr('class','more').hide() ;
+    backTop.hide();
+    loading.html('加载中...').show();
+}
+
+/*******************事件监听******************/
+
+  //切换搜索种类
+  $('.type').click(function(){
+    cate = $(this).attr('uid');
+    $('.now').removeClass('now');
+    $(this).addClass('now');
+    p_clear();
+    return loadImage(cate,key,skip,showImage,true);
+  });
+  //搜索
+  $('#search').click(function(){
+    var temp  = search.val() ;
+    if($.trim(temp).length===0){
+      return search.val(key);
+    }else{
+      key = temp;
+      p_clear();
+      return loadImage(cate,key,skip,showImage,true);
+    }
+  });
+
+  //搜索键盘监控
+  search.keydown(function(e){
+    if(e.keyCode == 13){
+      var temp  = search.val() ;
+      if($.trim(temp).length===0){
+        return search.val(key);
+      }else{
+        key = temp;
+        p_clear();
+        return loadImage(cate,key,skip,showImage,true);
+      }
+    }
+  }).focus(function(){
+     t_clear = t_clear || $('.t_clear');
+     if(search.val().length>0) return search.width(window_w-20-37-74) && t_clear.show();
+     return;
+  }).bind('input',function(){
+    return $(this).val().length==0 && (search.width(window_w-20-74) && t_clear.hide()) || (search.width(window_w-20-37-74) && t_clear.show());
+  });
+
+  $('.t_clear').click(function(){
+   return $(this).hide() && search.width(window_w-20-74).val('').focus();
+  });
+
+  //继续加载
+  $('.more').click(function(){
+    if($(this).hasClass('loadmore2')){
+      $(this).html('加载中...');
+      return loadImage(cate,key,skip,showImage,false);
+    }         
+    return ;
+  });
+
+/****************页面初始化加载*****************/
+  loadImage(cate,key,skip,showImage,true);
+
+/***********************************************/
+
+});
+
+</script>
+
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+{% end %}
+
+{% block body %}
+<ul class="search">
+<li class="t" style="overflow:hidden;">
+<input type="text" name="search" style="display:none;float:left;outline:0;border:1px solid #B6B6B6;border-right:0;border-radius:0;border-top-left-radius:5px;border-bottom-left-radius:5px;">
+<input type="image" src="static/images/t_clear_32.png" class="t_clear" id="t_clear" style="float:left;background:white;border:0;padding:0;padding-bottom: 13px;padding-top: 10px;border:1px solid #B6B6B6;border-right:0;border-left:0;border-radius:0;padding-right:10px;width:17px;height:17px;padding-left:10px;display:none;">
+<input src="http://s.androidesk.com/aoi/images/searchsign.png" type="image" style="float:left;background:#F7F7F7;" id="search">
+</li>
+    <li class="searchcate bg1">
+        <table cellspacing="0"><tr>
+                <td><a class="type all now" uid="all" href="#">全部</a></td>
+                <td><a class="type paper" uid="paper" href="#">壁纸</a></td>
+                <td><a class="type live" uid="live" href="#">动态壁纸</a></td>
+        </tr></table>
+    </li>
+</ul>
+
+<div id="p_box"></div>
+<div class="s_l_footer" style="position:relative;">
+  <div class="loading">加载中...</div>
+  <div class="more"></div>
+  <div class="backTop" onclick="window.scrollTo(0,0);return false;">
+    <div class="back_i"></div>
+    <div class="back_t">回顶部</div>
+  </div>
+</div>
+
+{% end %}

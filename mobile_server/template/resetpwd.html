@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+function checkForm()
+{
+    var pwd = $("input[name=passwd]").val();
+    var pwd2 = $("input[name=passwd2]").val();
+    if(pwd.length <=0){
+        alert("密码不能为空");
+        return false;
+    }
+    if(pwd.length <6 || pwd.lenght>20)
+    {
+    pwd=null;
+    pwd2=null;
+        alert("密码为6~20位字母或数字");
+        return false;
+    }
+    if(pwd!=pwd2)
+    {
+    pwd=null;
+    pwd2=null;
+        alert("两次密码不相同");
+        return  false;
+    }
+    pwd=null;
+    pwd2=null;
+    return true;
+}
+$(document).ready(function(){
+    if('{{message}}'!='none')
+    {
+        $(".reset").hide();
+    }
+    else
+    {
+        $(".success").hide();
+    }
+});
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+<h1 id="header">重置密码</h1>
+{% end %}
+
+{% block body %}
+<div class='success'>
+    <h3>{{message}}</h3>
+</div>
+<div class='reset'>
+    <form method="POST" onSubmit="return checkForm()">
+    {{ xsrf_form_html() }}
+    <ul class="login pd_b">
+        <li class="logo"><img style="background:#f3f3f3;" src="{{context['cdn']}}/images/logo.png" /></li>
+        <li><input type="hidden" name="email" value="{{email}}" /></li>
+        <li><input type="hidden" name="confirmation" value="{{confirmation}}" /></li>
+        <li class="mailsign"><dl><dt></dt><dd><input type="password" name="passwd" placeholder="输入您的新密码" class="inputshow" /></dd></dl></li>
+        <li class="mailsign"><dl><dt></dt><dd><input type="password" name="passwd2" placeholder="确认新密码" class="inputshow" /></dd></dl></li>
+        <li><input type="submit" value="确  定" /></li>
+    </ul>
+</form>
+</div>
+{% end %}

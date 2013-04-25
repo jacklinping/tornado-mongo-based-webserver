@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+var skipnum;
+var path;
+var isfinish=true;
+var imgw = parseInt(($(window).width()-16)*0.33);
+var imgh = parseInt(imgw*3/4);
+
+function loadImage(name,skip,uri)
+{
+    if(isfinish==false)
+        return;
+    isfinish=false;
+    skipnum = parseInt(skip);
+    if(isNaN(skipnum))skipnum=0;
+    ordervalue='rank'
+    var static_server = "{{context['static_server']}}";
+    if(skip=='0')
+        $(".list").empty();
+    var url = '/morefind_tag?name='+name+'&skip='+skipnum+'&jsoncallback=?&d='+Math.random();
+    $(".load").html('加载中...');
+    var needKill=true;
+    var myAjaxCall=$.getJSON(url,function(resp){
+            needKill=false;
+            var len = resp.resp.length;
+            var html='';
+            for(i=0;i<len;i++)
+            {
+            html+="<li><a href='/tagpaperDetail?imgid="+resp.resp[i].imgid+"&offset="+skipnum+"&name="+name+"#t1:0#t0:0'><img src='http://{{context['static_server']}}/download/"+resp.resp[i].image+"' style='width:"+imgw+"px;height:"+imgh+"px;'></a></li>";
+            skipnum++;
+            }
+            $(".list").append(html);
+            html=null;
+            if(resp.code==1){
+                skipnum+=(18-len);
+            len=18;
+            }
+            $(".load").html('点击加载更多');
+            if(len<18 || (len>18 && len<30))
+            {
+            $(".load").html('没有更多啦！');
+               // $(".loadmore").hide();
+            }
+            $(".load").show();
+            isfinish=true;
+            myAjaxCall=null;
+            resp=null;
+            return false;
+            });
+    setTimeout(function(){
+            if(needKill){
+            myAjaxCall.abort();
+            $(".load").html('网络异常，再试一次');
+            isfinish=true;
+            myAjaxCall=null;
+            }
+            },10000);
+    url=null;
+}
+function switchList(e)
+{
+    $(".more").each(function(){
+            $(this).removeClass("now");
+            });
+    $(this).addClass("now");
+    //var order = $(this).attr("href");
+    loadImage('{{name}}','0','{{uri_quote}}');
+    return false;
+}
+function loadMore(e)
+{
+    loadImage('{{name}}',skipnum,'{{uri_quote}}');
+    return false;
+}
+$(document).ready(function(){
+        var tmp = parseInt({{skip}});
+        tmp = tmp-3;
+        if(tmp<0)
+            tmp=0;
+
+            loadImage('{{name}}',tmp,'{{uri_quote}}');
+        $("a.more").unbind("click");
+        $("a.more").bind("click",switchList);
+        $("a.load").unbind("click");
+        $("a.load").bind("click",loadMore);
+        $(".next").click(function(){
+            var page=$(".pagetext").val();
+            page=parseInt(page);
+            skipnum=(page-1)*30;
+            if(skipnum<0)
+                skipnum=0;
+            $(".list").empty();
+            loadImage('{{name}}',skipnum,'{{uri_quote}}');
+            });
+        });
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block banner %}
+{% end %}
+
+{% block body %}
+<body>
+    <h1 id="header"><a class="toBack" href="{{uri}}#t1:7#t0:1">返 回</a>{{tag['name']}}</h1>
+<ul class="list pd_b">
+</ul>
+<div class="loadmore"><a class="load" href="#">点击加载更多</a><a class="totop" href="#"  onclick="window.scrollTo(0,0);return false;"><div><div class="totop_img"></div><div class="totop-text">回顶部</div></div></a></div>
+
+</body>
+{% end %}

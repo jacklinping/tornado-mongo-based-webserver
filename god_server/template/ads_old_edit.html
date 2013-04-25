@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block head %}
+{% end %}
+
+{% block body %}
+<div class="side">
+    <div class="side_inside">
+        <ul>
+            <li><a href="/ads/home">新版</a></li>
+            <li><a href="/ads/old" class="now">老版</a></li>
+        </ul>
+    </div>
+</div>
+<div class="main">
+    <form enctype="multipart/form-data" method="POST" action="/ads/old">
+        {{ xsrf_form_html() }}
+        <table class="long">
+            <tr><img src="http://static.androidesk.com/download/{{ activity['banner'] }}"><td></td><td></td></tr>
+            <tr><td>跳转url</td><td><input type="text" id="url" name="url" value="{{ activity['url'] }}" required="required"></td></tr>
+            <tr><td>上传图片</td><td><input type="file" id="image" name="image"></td></tr>
+            <tr><td></td><td><input type="submit" class="button primary"  value="修改"></td></tr>
+        </table>
+    </form>
+</div>
+{% end %}

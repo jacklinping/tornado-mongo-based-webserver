@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+    $(document).ready(function(){
+    var submit_rating = function(apkId,star_num){
+      if(star_num > 0 && star_num <= 5 && apkId!=undefined){
+        return $.get("/livemark",{ apkid:apkId,score:star_num});
+      }
+      return;
+    }
+
+    $('.star').find('span').click(function(){
+      if($(this).attr('class') == 's_on' && ($(this).next().attr('class') == 's_off' || $(this).next().length==0 )) {
+        $(this).attr('class','s_off');    
+      }
+      else if($(this).attr('class') == 's_off'){ 
+        $(this).attr('class','s_on');
+      }
+      $(this).prevUntil().attr('class','s_on');
+      $(this).nextUntil().attr('class','s_off');
+      //提交评级
+      return submit_rating('{{apk["_id"]}}',+$(this).parent().children('.s_on').length);
+      });
+
+        $(".scale35").each(function(){
+            w = $(this).width();
+            $(this).height(w*5/3);
+        });
+            $("a.downapk").bind("click",function(){
+                var aid=$(this).attr('id');
+                var url = '/addfavorite/'+aid+'?type=1&jsoncallback=?&d='+Math.random();
+                $.getJSON(url,function(resp){
+                    });
+                url=null;
+                aid=null;
+                });
+            $("a.tmp").bind("click",function(){
+                var rnum = $('#ranknum').html();
+                rnum = parseInt(rnum);
+                var href=$(this).attr("href");
+                if($(this).hasClass('disfav'))
+                    {
+                        $.getJSON(href,function(resp){
+                        });
+                        $(this).removeClass('disfav');
+                        $(this).removeClass('now');
+                        $(this).addClass('fav');
+                        $(".funlike").removeClass("isfavor");
+                        $(".funlike").addClass("notfavor");
+
+                        $(this).attr('href','/favorite/{{apk['_id']}}?type=1#t8:{{apk['_id']}}#t0:1');
+                        rnum -= 1;
+                    }
+                 else if($(this).hasClass('fav'))
+                 {
+                    $.getJSON(href,function(resp){
+                        });
+                    $(this).removeClass('fav');
+                    $(this).addClass('now');
+                    $(this).addClass('disfav');
+                    $(".funlike").removeClass("notfavor");
+                    $(".funlike").addClass("isfavor");
+
+                    $(this).attr('href','/disfavorite/{{apk['_id']}}?type=1#t9:{{apk['_id']}}#t0:1');
+                    rnum += 1;
+                 }
+                $('#ranknum').html(rnum);
+                window.location.href=href;
+                href=null;
+                rnum=null;
+                return false;
+            });
+            });
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+<h1 id="header"><a class="toBack" href="/search?keyword={{keyword}}&skip={{skip}}&type=live#t1:7#t0:1">返 回</a><span>{{apk['name']}}</span><a class="hcate" href="/liveTips#t0:2">帮 助</a></h1>
+{% end %}
+
+{% block body %}
+<div class="detail pd_b dtdetail">
+    <div class="imgshow divli">
+        {% for ig in apk['originids'] %}
+        <span><img src="http://{{context['static_server']}}/thumbnail/{{ig}}?type=1" class="scale35" /></span>
+        {% end %}
+    </div>
+    <div class="hotnum divli">
+
+        <div class="fire">
+        <div class="rate_now">
+        {% for i in xrange(0,score) %}
+          <span class="s_on sr"></span>
+        {% end %}
+        {% for j in xrange(score,5) %}
+          <span class="s_off sr"></span>
+        {% end %}
+        </div>
+        <span class="rate_amount">{{amount}}个评级</span>
+        <div class="fire_box">
+          <span class="f1" id="ranknum">{{apk['rank']}}</span>
+          <span class="f2"></span>
+        </div>
+    </div>
+
+
+    <div class="livefun">
+        <a class='downapk' id='{{apk['_id']}}' href="http://apk.androidesk.com/{{apk['savepath']}}#t2:{{apk['name']}},{{apk['package_name']}},{{apk['package_version']}},{{apk['package_size']}}#t0:1"><button class="button white">应用</button></a>
+        <ul class="funlivelist">
+            {% if favstate==1 %}
+                <li><a class='disfav tmp' href="/disfavorite/{{apk['_id']}}?type=1&referer={{referer}}#t9:{{apk['_id']}}#t0:1"><div class="isfavor funlike"><span class="funspan">喜欢</span></div></a></li>
+            {% elif favstate==0 %}
+                <li><a class='fav tmp' href="/favorite/{{apk['_id']}}?type=1&referer={{referer}}#t8:{{apk['_id']}}#t0:1"><div class="notfavor funlike"><span class="funspan">喜欢</span></div></a></li>
+        {% else %}
+        <li><a href="/login?next={{referer}}#t0:2"><div class="notfavor funlike"><span class="funspan">喜欢</span></div></a></li>
+        {% end %}
+        <li><a href="http://{{context['static_server']}}/thumbnail/{{apk['thumbid'][0]}}?type=1#t16#t0:1"><div class="funshare"><span class="funspan">分享</span></div></a></li>
+    </ul>
+</div>
+</div>
+{% if context['se']['login']==True %}
+<div class="get_rate_box">
+  <span class="get_rate_score">请为它打分:</span>
+  <div class="star">
+    <span class="s_off"></span>
+    <span class="s_off"></span>
+    <span class="s_off"></span>
+    <span class="s_off"></span>
+    <span class="s_off"></span>
+  </div>
+</div>
+{% end %}
+<div class='divli taglist' style="border-top:1px solid #d3d3d3;"><ul>
+        <li class="t"><div class="txt">
+            名称：{{apk['name']}}<br>
+            <span id='admsg'>提示：</span>来源于网络，可能内含广告<br>
+            大小：{{apk['package_size']}}M<br>
+            描述：{{apk['descr']}}
+    </div></li></ul>
+    </div>
+</div>
+{% end %}
+{% block footer %}
+{% end %}

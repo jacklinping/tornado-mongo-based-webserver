@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+var skipnum;
+var uid;
+var isfinish=true;
+var width = $(window).width();
+var imgw = parseInt((width-32)*0.33);
+var imgh = parseInt(imgw*3/4);
+
+function loadImage(userid,skip)
+{
+    if(isfinish==false)
+        return;
+    isfinish=false;
+    skipnum = parseInt(skip);
+    if(isNaN(skipnum))skipnum=0;
+    uid = userid;
+    if(skip=='0')
+    {
+        $(".list").empty();
+    }
+    var url ='/moreattention?userid='+uid+'&skip='+skipnum+'&jsoncallback=?&d='+Math.random();
+    $(".load").html('加载中...');
+    var needKill=true;
+    var myAjaxCall=$.getJSON(url,function(resp){
+            needKill=false;
+            var len = resp.resp.length;
+            var html='';
+        for(i=0;i<len;i++)
+        {
+            html += "<a class='dir' href='/paperdirList?path="+resp.resp[i].dirid+"' style='padding:4px;'><li class='dir' style='width: 100%;'><img width='93' height='70' class='avatar' src='http://{{context['static_server']}}/download/"+resp.resp[i].image+"' /><div class='rname'><h4 style='white-space:nowrap;overflow:hidden; text-overfollow:elipsis'>"+resp.resp[i].rname+"</h4><span>"+resp.resp[i].descr+"</span></div><div style='float: right;margin-right: 8px;color:gray;'><div>关注<span style='margin-left: 5px;line-height: 16px;'>"+resp.resp[i].follow_num+"</span></div><div>更新<span style='margin-left: 5px;'>"+resp.resp[i].newimg_num+"</span></div></div><div style='clear:both;'></div></li>";
+            skipnum++;
+        }
+        $(".list").append(html);
+        html=null;
+        $(".load").html('点击加载更多');
+        if(len<10)
+        {
+        $(".load").html('没有更多啦！');
+           // $(".loadmore").hide();
+        }
+        if(skipnum<1)
+        {
+            $(".loadmore").hide();
+            $(".list").html("好懒！什么专辑都没关注");
+        }
+        $(".load").show();
+        myAjaxCall=null;
+        resp=null;
+        isfinish=true;
+        return false;
+    });
+
+    setTimeout(function(){
+            if(needKill){
+            myAjaxCall.abort();
+            $(".load").html('网络异常，再试一次');
+            isfinish=true;
+            needKill=false;
+            myAjaxCall=null;
+            }
+            },10000);
+
+    url=null;
+}
+function loadMore(e)
+{
+    loadImage(uid,skipnum);
+    return false;
+}
+$(document).ready(function(){
+        var tmp = parseInt({{skip}});
+        tmp = tmp-3;
+        if(tmp<0)
+        {
+            tmp = 0;
+        }
+        loadImage('{{userid}}',tmp);
+        $("a.load").unbind("click");
+        $("a.load").bind("click",loadMore);
+        $(".next").click(function(){
+            var page = $(".pagetext").val();
+            page = parseInt(page);
+            skipnum = (page-1)*9;
+            if(skipnum<0)
+            {
+                skipnum=0;
+            }
+            $(".list").empty();
+            loadImage(uid,skipnum);
+            page=null;
+            });
+        });
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+{% if referer=='/personal' %}
+<h1 id="header"><a class="toBack" href="{{referer}}#t1:7">返 回</a>我的关注</h1>
+{% else %}
+<h1 id="header"><a class="toBack" href="{{referer}}#t1:7">返 回</a>Ta的关注</h1>
+{% end %}
+{% end %}
+
+{% block body %}
+<ul class="list pd_b">
+</ul>
+<div class="loadmore"><a class="load" href="#">点击加载更多</a><a class="totop" href="#"  onclick="window.scrollTo(0,0);return false;"><div><div class="totop_img"></div><div class="totop-text">回顶部</div></div></a></div>
+{% end %}
+

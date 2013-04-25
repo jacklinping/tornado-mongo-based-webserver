@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+var skipnum;
+var cid;
+var ordervalue;
+var isfinish=true;
+function loadImage(cateid,skip,order)
+{
+    if(isfinish==false)
+        return;
+    isfinish=false;
+    skipnum = parseInt(skip);
+    if(isNaN(skipnum))skipnum=0;
+    cid = cateid;
+    ordervalue = order;
+    if(order=='hot')
+    {
+        $(".more").each(function(){
+            $(this).removeClass("now");
+            });
+        $(".hot").addClass("now");
+    }
+    if(skip=='0')
+    {
+        $(".list").empty();
+    }
+    $(".load").html('加载中...');
+    var url ='/themeMore?cateid='+cateid+'&skip='+skipnum+'&order='+order+"&jsoncallback=?&d="+Math.random();
+    $.getJSON(url,function(resp){
+        var len = resp.resp.length;
+        for(i=0;i<len;i++)
+        {
+            var html="<a href='/themeDetail/"+resp.resp[i]._id+"?skip="+skipnum+"&order="+order+"#t1:0#t0:0' style='padding:4px;'><img src='http://{{context['static_server']}}/thumbnail/"+resp.resp[i].thumbid+"?type=2' class='scale35' />";
+            $(".list").append(html);
+            skipnum++;
+        }
+        $(".load").html('点击加载更多');
+        if(len<9)
+        {
+            $(".load").hide();
+        }
+        var width = $(window).width();
+        var w = (width-24)*0.32;
+        $(".scale35").each(function(){
+            $(this).width(w);
+            $(this).height(w*5/3);
+            });
+        isfinish=true;
+        return false;
+    });
+
+
+}
+function switchList(e)
+{
+    $(".load").show();
+    $(".more").each(function(){
+        $(this).removeClass("now");
+        });
+    $(this).addClass("now");
+    var order = $(this).attr("href");
+    loadImage('{{cateid}}','0',order);
+    return false;
+}
+function loadMore(e)
+{
+    loadImage(cid,skipnum,ordervalue);
+    return false;
+}
+$(window).load(function(){
+
+        var tmp = parseInt({{skip}});
+        tmp = tmp-3;
+        if(tmp<0)
+        {
+            tmp = 0;
+        }
+        loadImage('{{cateid}}',tmp,'{{order}}');
+        $("a.more").unbind("click");
+        $("a.more").bind("click",switchList);
+        $("a.load").unbind("click");
+        $("a.load").bind("click",loadMore);
+        $(".next").click(function(){
+            var page = $(".pagetext").val();
+            page = parseInt(page);
+            skipnum = (page-1)*9;
+            if(skipnum<0)
+            {
+                skipnum=0;
+            }
+            $(".list").empty();
+            loadImage(cid,skipnum,ordervalue);
+            });
+        });
+</script>
+{% end %}
+{% block location %}
+{% end %}
+
+{% block header %}
+<h1 id="header"><a href="/themeCate#t1:7"><img src="/static/images/back.png" /></a>{{cname}}</h1>
+{% end %}
+
+{% block body %}
+<div class="cate_t bg1">
+    <span class="bg1"><a href="newest" class="now more">最新</a><a href="hot" class="more hot">热门</a></span>
+</div>
+<ul class="list pd_b">
+</ul>
+<div class="loadmore"><a class="load" href="#">点击加载更多</a><a class="totop" href="#"  onclick="window.scrollTo(0,0);return false;"><div><div class="totop_img"></div><div class="totop-text">回顶部</div></div></a></div>
+
+{% end %}
+

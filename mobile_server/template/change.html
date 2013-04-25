@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+function checkForm()
+{
+        var msg='';
+         var nick = $("input[name=name]").val();
+         if(nick == null || nick.lenght<2 || nick.length>16)
+         {
+            msg = '用户昵称长度需要在2~16位';
+             try{
+                showToastClient(msg);
+                }
+                catch(err){
+                    alert(msg);
+                }
+             msg = null;
+             return false;
+         }
+         msg = null;
+         return true;
+    }
+$(document).ready(function(){
+	$("input[type=radio]").click(function(){
+        $("label").each(function(){ $(this).css({"background-image":"url({{context['cdn']}}/images/radio_n.png)"}); $(this).children("input").removeAttr("name"); });
+        $(this).parent("label").css({"background-image":"url({{context['cdn']}}/images/radio_y.png)"});
+        $(this).attr("name","sex");
+        if($(".logo").hasClass("avatar1")==false){
+        if($(this).parent("label").hasClass("radiom1"))
+        $(".logo img").attr("src","{{context['cdn']}}/images/logo2.png");
+        else
+        $(".logo img").attr("src","{{context['cdn']}}/images/logo3.png");
+        }
+
+	});
+    if('{{message}}'!='None')
+    {
+        try{
+            showToastClient('{{message}}');
+        }
+        catch(err){
+            alert('{{message}}');
+        }
+    }
+});
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+<h1 id="header"><a class="toBack" href="/personal#t1:7">返 回</a>修改资料</h1>
+{% end %}
+
+{% block body %}
+<form method="POST" onSubmit="return checkForm()">
+    {{ xsrf_form_html() }}
+    <ul class="login pd_b">
+        {% if user['avatar'] %}
+        <li class="logo avatar1"><img src="http://{{context['static_server']}}/download/{{user['avatar']['avatar']}}" /></li>
+        {% elif user['gender']=='1' %}
+        <li class="logo"><img src="{{context['cdn']}}/images/logo2.png" /></li>
+        {% else %}
+        <li class="logo"><img src="{{context['cdn']}}/images/logo3.png" /></li>
+        {% end %}
+        <li class="namesign"><dl><dt></dt><dd><input type="text" name="name" value="{{user['nickname']}}" class="inputshow" required="required" /></dd></dl></li>
+        <li class="sexsign"><dl><dt>性别</dt><dd class="tr">
+            {% if user['gender']=='1' %}
+            <label class='radiom1' style="background-image:url('{{context['cdn']}}/images/radio_y.png');"><input type="radio" value="1" name="sex" />男</label>
+            <label class='radiom0'><input type="radio" value="0" />女</label>
+            {% else %}
+            <label class='radiom1'><input type="radio" value="1" />男</label>
+            <label class='radiom0' style="background-image:url('{{context['cdn']}}/images/radio_y.png');"><input type="radio" value="0" name="sex" />女</label>
+            {% end %}
+            </dd></dl></li>
+        <li><input type="submit" value="保  存" /></li>
+        <li class="tc">电脑访问<a class="uplink" href="http://up.androidesk.com">up.androidesk.com</a>即可修改头像</li>
+    </ul>
+</form>
+{% end %}

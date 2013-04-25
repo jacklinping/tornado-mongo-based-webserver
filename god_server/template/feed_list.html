@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block head %}
+{% end %}
+
+{% block body %}
+<div class="main">
+    <ul style="margin: 10px; border: 1px solid #DDD">
+        {% for i in feedback %}
+        <li style="margin: 10px; border: 1px solid #DDD">
+        <span>{{ i['datetime'] }}| {{ i['ua']}}| {{ i['email']}}</span><br>
+        <span>{{ i['feedContent'] }}</span>
+        </li>
+        {% end %}
+    </ul>
+    <div class="page">
+        <a href="/feedback/list/0">首页</a>
+        {% if front != None %}
+        <a href="/feedback/list/{{ front }}">上一页</a>
+        {% end %}
+        <span>{{ page }}</span>
+        {% if end != None %}
+        <a href="/feedback/list/{{ end }}">下一页</a>
+        {% end %}
+        {% if tail != None %}
+        <a href="/feedback/list/{{ tail }}">尾页</a>
+        {% end %}
+    </div>
+</div>
+{% end %}

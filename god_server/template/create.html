@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+</script>
+{% end %}
+{% block loation %}
+{{message}}
+{% end %}
+{% block banner %}
+{% end %}
+
+{% block body %}
+<div>
+    <form enctype="multipart/form-data" method="POST">
+        {{ xsrf_form_html() }}
+        <label>分类名称</label>
+        <input type="text" name="name" required="required" /><br>
+        <label>英文名称</label>
+        <input type="text" name="rname" required="required" /><br>
+        <label>分类缩略图</label>
+        <input type="file" name="thumb" value="thumb" required="required" /><br>
+<!--        <label>分类Icon(主题必添)</label>-->
+<!--        <input type="file" name="icon" value="icon" /><br>-->
+        <input type="submit" value="提交" />
+    </form>
+</div>
+
+{% end %}

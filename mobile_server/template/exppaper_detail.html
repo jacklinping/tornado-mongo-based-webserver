@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+    $.fn.auto_adjust = function() {
+        var width = parseInt($(window).width() - 10);
+        var height = parseInt(width * 4 / 5);
+
+        $("#origin").css({
+                "height": height,
+//                "width": width
+                });
+    };
+
+$(document).ready(function() {
+    if('{{message}}'!='None')
+    {
+        try{
+        showToastClient('{{message}}');
+            }
+        catch(err){
+            alert('{{message}}');
+        }
+    }
+    $.fn.auto_adjust();
+   
+    $("a.tmp").click(function() {
+
+        var href=$(this).attr("href");
+        $.getJSON(href, function(data) {
+            });
+
+        var id = $(this).attr("id");
+
+        var rnum = $('#ranknum').html();
+        rnum = parseInt(rnum);
+
+        if ($(this).hasClass("private")) {
+        $(this).removeClass("private");
+        $(this).addClass("now");
+        $(this).addClass("cancel_private");
+        $(".funlike").removeClass("notfavor");
+        $(".funlike").addClass("isfavor");
+
+        $(this).attr("href", "/cancel_add_private?imgid="+id+"#t0:1#t7:"+id);
+        rnum += 1;
+
+        } else {
+        $(this).removeClass("cancel_private");
+        $(this).addClass("private");
+        $(this).removeClass("now");
+        $(".funlike").removeClass("isfavor");
+        $(".funlike").addClass("notfavor");
+
+        $(this).attr("href", "/add_private?imgid="+id+"#t0:1#t6:"+id);
+        rnum -= 1;
+
+        }
+        $('#ranknum').html(rnum);
+        window.location.href=href;
+        href=null;
+        return false;
+    });
+
+    $("a.tagup").click(function(){
+                if("{{context['se']['login']}}"=='True')
+                {
+                var url = $(this).attr("href")+"&jsoncallback=?&d="+Math.random();
+                var upobj = $(this).parent().children('span');
+                var upnum = $(this).parent().children('span').html();
+                upnum = upnum.slice(1);
+                   $.getJSON(url,function(resp){
+                           if(resp.code==0)
+                           {
+                               var pnum = parseInt(upnum);
+                               pnum += 1;
+                               upobj.html('x'+pnum);
+                               }
+                               upobj=null;
+                               upnum=null;
+                           try{
+                               showToastClient(resp.resp);
+                               }
+                           catch(err){
+                               alert(resp.resp);
+                               }
+                    });
+                   url=null;
+                }
+                else
+                {
+                window.location.href= '/login?next={{referer}}#t0:2';
+                }
+                return false;
+        });
+
+
+    });
+function addtag()
+{
+    var tag = $("input[name=tag]").val();
+    var uri = $("input[name=uri]").val();
+    location.href = "/add_tag?name="+tag+"&imgid={{image['_id']}}"+"&ref="+uri+"&type=add";
+    tag=null;
+    uri=null;
+}
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block banner %}
+{% end %}
+
+{% block body %}
+<body>
+    <h1 id="header"><a class="toBack" href="/explorer#t1:7#t0:1">返 回</a>壁纸</h1>
+<div class="detail pd_b">
+    <div class='divli'>
+    {% if net == 'pc' %}
+            <img id="origin" width="300" height="225" src="http://{{context['static_server']}}/download/{{image['fobjs']['960x800']}}" class="scale43" >
+    {% else %}
+            <img id="origin" width="300" height="225" src="http://{{context['static_server']}}/download/{{image['fobjs']['480x384']}}" class="scale43" >
+    {% end %}
+    </div>
+    <div class="hotnum divli">
+     <ul class="fire">
+        <li class="f1" id="ranknum">{{image['rank']+image['favs']}}</li>
+        <li class="f2"></li>
+      </ul>
+
+    <div class="paperfun">
+            {% if login %}
+                <a class="setWideWallpaper" href="http://{{context['static_server']}}/wallpaper?imgid={{image['_id']}}&uid={{handler.session.uid}}#t4#t0:1"><button class="button white">设为壁纸</button></a>
+            {% else %}
+                <a class="setWideWallpaper" href="http://{{context['static_server']}}/wallpaper?imgid={{image['_id']}}#t4#t0:1"><button class="button white">设为壁纸</button></a>
+            {% end %}
+        <ul class="funlist">
+            <li><a href="http://{{context['static_server']}}/wallpaper?imgid={{image['_id']}}#t3"><div class="fundown"><span class="funspan">下载</span></div></a></li>
+            {% if favstate==0 %}
+                <li><a class="tmp private" id="{{image['_id']}}" href="/add_private?imgid={{image['_id']}}&referer={{referer}}#t6:{{image['_id']}}#t0:1"><div class="notfavor funlike"><span class="funspan">喜欢</span></div></a></li>
+            {% elif favstate==1 %}
+                <li><a class="tmp cancel_private now" id="{{image['_id']}}" href="/cancel_add_private?imgid={{image['_id']}}&referer={{referer}}#t7:{{image['_id']}}#t0:1"><div class="isfavor funlike"><span class="funspan">喜欢</span></div></a></li>
+            {% else %}
+                <li><a href="/login?next={{referer}}#t0:2"><div class="notfavor funlike"><span class="funspan">喜欢</span></div></a></li>
+            {% end %}
+            <li><a class="share" href="http://{{context['static_server']}}/download/{{image['fobjs']['480x320']}}#t0:1#t12:{{image['fobjs']['1280x960']}}"><div class="funshare"><span class="funspan">分享</span></div></a></li>
+        </ul>
+    </div>
+    </div>
+
+	<div class='divli taglist' style="border-top:1px solid #d3d3d3;"><ul>
+		<li class="t"><div>标签</div></li>
+        {% for i in tags %}
+            {% if i['name'].find('_')!=0 %}
+            <li><a class="tag" href="/find_tag?name={{i['name']}}#t0:2">{{i['name']}}</a><span>x{{i['num']}}</span><a href="/add_tag?name={{i['name']}}&imgid={{image['_id']}}" class="tagup bg1 upml">顶</a></li>
+            {% end %}
+        {% end %}
+        <li class="add">
+         <form class="form" id="tag-form" method="POST" action="/add_tag" onsubmit="getElementById('submit').disabled=true;return true">
+         {{ xsrf_form_html() }}
+        <input type="submit"  id="submit"  class="bg1 fr" value="添加" />
+        <input type="hidden" name="ref" value="{{referer}}" />
+        <input type="hidden" name="imgid" value="{{image['_id']}}" />
+        <span>
+            <input type="text" name="name" placeholder="登录后添加与图片相关的标签" />
+        </span>
+        </form>
+        </li>
+	</ul></div>
+</div>
+</body>
+{% end %}

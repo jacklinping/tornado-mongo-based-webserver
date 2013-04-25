@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block head %}
+{% end %}
+
+{% block body %}
+<div class="main">
+    <form enctype="multipart/form-data" method="POST" action="/ads/home/create">
+        {{ xsrf_form_html() }}
+        <table class="long">
+            <tr><td>排序号</td><td><input type="number" id="rank" name="rank" required="required"></td></tr>
+            <tr><td>跳转url</td><td><input type="text" id="url" name="url" required="required"></td></tr>
+            <tr><td>上传图片</td><td><input type="file" id="image" name="image" required="required"></td></tr>
+            <tr><td></td><td><input type="submit" class="button primary"  value="增加"></td></tr>
+        </table>
+    </form>
+</div>
+{% end %}

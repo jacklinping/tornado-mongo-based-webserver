@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+    $(document).ready(function(){
+            if('{{message}}'!='None')
+            {
+            try{
+                showToastClient('{{message}}');
+                }
+                catch(err){
+                    alert('{{message}}');
+                    }
+            }
+            });
+ function checkForm()
+    {
+    	var email = $.trim($("#email").val()).toLowerCase();
+        $("#email").val(email.replace("＠", "@"));
+        $("#email").val($("#email").val().replace("﹫", "@"));
+        $("#email").val($("#email").val().replace("。", "."));
+
+        var msg='';
+        var emailStr = $("input[name=email]").val();
+
+        if(emailStr.length <= 0){
+            msg='邮箱不能为空'
+            try{
+                showToastClient(msg);
+            }
+            catch(err){
+                alert(msg);
+            }
+            email = null;
+            msg = null;
+            return false;
+        }
+        //var emailPat = /^(.+)@(.+)$/;
+    	var emailPat =  /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$/;
+        var matchArray = emailStr.match(emailPat);
+	    if(matchArray==null){
+             msg = '邮箱格式有误';
+            try{
+                showToastClient(msg);
+                }
+           catch(err){
+                    alert(msg);
+           }
+           msg=null;
+             return false;
+        }
+        matchArray=null;
+        emailPat=null;
+        email=null;
+}
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+<h1 id="header"><a class="toBack" href="/login?next={{referer}}#t1:7#t0:1">返 回</a>忘记密码</h1>
+{% end %}
+
+{% block body %}
+<form method="POST" onSubmit="return checkForm()">
+    {{ xsrf_form_html() }}
+    <ul class="login pd_b">
+        <li class="logo"><img style="background:#f3f3f3;" src="{{context['cdn']}}/images/logo.png"></li>
+        <li><input type="hidden" name="referer" value="{{referer}}" /></li>
+        <li class="mailsign"><dl><dt></dt><dd><input type="text" name="email" id="email" placeholder="您的邮箱" class="inputshow" /></dd></dl></li>
+        <li><input type="submit" value="确  定" /></li>
+    </ul>
+</form>
+{% end %}

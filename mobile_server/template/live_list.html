@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+var skipnum;
+var cid;
+var ordervalue;
+var isfinish=true;
+var maxnum=18;
+var minnum=9;
+var width = $(window).width();
+var imgw = parseInt((width-16)*0.33);
+var imgh = parseInt(imgw*5/3);
+function loadImage(cateid,skip,order)
+{
+    if(isfinish==false)
+        return;
+    isfinish=false;
+    skipnum = parseInt(skip);
+    if(isNaN(skipnum))skipnum=0;
+    cid = cateid;
+    ordervalue = order;
+    if(order=='hot')
+    {
+        $(".more").removeClass("now");
+        $(".hot").addClass("now");
+    }
+    if(skip=='0')
+    {
+        $(".list").empty();
+    }
+    var url ='/liveMore?cateid='+cateid+'&skip='+skipnum+'&order='+order+'&jsoncallback=?&d='+Math.random();
+    var needKill=true;
+    $(".load").html('加载中...');
+    var myAjaxCall = $.getJSON(url,function(resp){
+            needKill=false;
+            var len = resp.resp.length;
+            var html='';
+        for(i=0;i<len;i++)
+        {
+        html+="<li><a href='/liveDetail/"+resp.resp[i]._id+"?skip="+skipnum+"&order="+order+"#t1:0#t0:0' ><img src='http://{{context['static_server']}}/thumbnail/"+resp.resp[i].thumbid+"?type=1' style='width:"+imgw+"px;height:"+imgh+"px;'></a></li>";
+            skipnum++;
+        }
+        $(".list").append(html);
+        html=null;
+        $(".load").html('点击加载更多');
+        if(len<minnum || (len>minnum && len<maxnum))
+        {
+           $(".load").html('没有更多啦！');
+        }
+
+        $(".load").show();
+        myAjaxCall=null;
+        resp=null;
+        isfinish=true;
+        return false;
+    });
+    setTimeout(function(){
+            if(needKill){
+            myAjaxCall.abort();
+            $(".load").html('网络异常，再试一次');
+            isfinish=true;
+            myAjaxCall=null;
+            }
+            },10000);
+    url=null;
+
+
+}
+function setURL(e)
+{
+    var curskip=$(this).attr('id');
+    curskip="#"+curskip+":"+ordervalue;
+    window.location.hash=curskip;
+}
+function switchList(e)
+{
+    $(".load").show();
+    $(".loadmore").removeAttr("disabled");
+    $(".more").removeClass("now");
+    $(this).addClass("now");
+    var order = $(this).attr("href");
+    loadImage('{{cateid}}','0',order);
+    order=null;
+    return false;
+}
+function loadMore(e)
+{
+    loadImage(cid,skipnum,ordervalue);
+    return false;
+}
+$(document).ready(function(){
+        var tmp = parseInt({{skip}});
+        var tord = '{{order}}';
+        if(window.location.hash)
+        {
+        return;
+            var hashstr=window.location.hash;
+            parms = hashstr.split(":");
+            tmp = parseInt(parms[0].slice(1));
+            tord = parms[1];
+        }
+        tmp = tmp-4;
+        if(tmp<0)
+        {
+            tmp = 0;
+        }
+        loadImage('{{cateid}}',tmp,tord);
+        $("a.more").unbind("click");
+        $("a.more").bind("click",switchList);
+        $("a.load").unbind("click");
+        $("a.load").bind("click",loadMore);
+        $(".next").click(function(){
+            var page = $(".pagetext").val();
+            page = parseInt(page);
+            skipnum = (page-1)*9;
+            if(skipnum<0)
+            {
+                skipnum=0;
+            }
+            $(".list").empty();
+            loadImage(cid,skipnum,ordervalue);
+            page=null;
+            });
+        });
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+<h1 id="header"><a class="toBack" href="/index#t1:7">返 回</a>{{cname}}</h1>
+{% end %}
+
+{% block body %}
+<div class="cate_t bg1">
+    <span class="bg1"><a href="newest" class="now more" style="position:relative;">最新<div class="ca_bar_1"></div><div class="ca_bar_2"></div></a><a href="hot" class="more hot">热门</a></span>
+</div>
+<ul class="list pd_b">
+</ul>
+<div class="loadmore"><a class="load" href="#">点击加载更多</a><a class="totop" href="#"  onclick="window.scrollTo(0,0);return false;"><div><div class="totop_img"></div><div class="totop-text">回顶部</div></div></a></div>
+{% end %}
+

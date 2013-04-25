@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+var width = $(window).width();
+var skipnum;
+var uid;
+var isfinish=true;
+function loadImage(userid,skip)
+{
+    if(isfinish==false)
+        return;
+    isfinish=false;
+    skipnum = parseInt(skip);
+    if(isNaN(skipnum))skipnum=0;
+    uid = userid;
+
+    if(skip=='0')
+    {
+        $(".list").empty();
+    }
+    $(".load").html('加载中...');
+    var url ='/morefavortheme?userid='+uid+'&skip='+skip+'&jsoncallback=?&d='+Math.random();
+    $.getJSON(url,function(resp){
+        var len = resp.resp.length;
+        for(i=0;i<len;i++)
+        {
+        var html="<a href='/themeFavor?skip="+skipnum+"&userid="+uid+"#t1:0#t0:0' style='padding:4px;'><img src='http://{{context['static_server']}}/thumbnail/"+resp.resp[i].thumbid+"?type=2' class='scale35' />";
+            $(".list").append(html);
+            skipnum++;
+        }
+        if(len<9)
+        {
+            $(".load").hide();
+        }
+        var w = (width-40)*0.32;
+        $(".scale35").each(function(){
+            $(this).width(w);
+            $(this).height(w*5/3);
+            });
+        $(".load").html('点击加载更多');
+        isfinish=true;
+        return false;
+    });
+
+
+}
+function loadMore(e)
+{
+    loadImage(uid,skipnum);
+    return false;
+}
+$(window).load(function(){
+
+        var tmp = parseInt({{skip}});
+        tmp = tmp-3;
+        if(tmp<0)
+        {
+            tmp = 0;
+        }
+        loadImage('{{userid}}',tmp);
+        $("a.load").unbind("click");
+        $("a.load").bind("click",loadMore);
+        $(".next").click(function(){
+            $(".load").show();
+            var page = $(".pagetext").val();
+            page = parseInt(page);
+            skipnum = (page-1)*9;
+            if(skipnum<0)
+            {
+                skipnum=0;
+            }
+            $(".list").empty();
+            loadImage(uid,skipnum);
+            });
+        });
+</script>
+{% end %}
+{% block location %}
+{% end %}
+
+{% block header %}
+<h1 id="header"><a class="toBack" href="/myfavorite/{{userid}}#t1:7">返 回</a>收藏-主题</h1>
+{% end %}
+
+{% block body %}
+<ul class="list pd_b">
+</ul>
+<div class="loadmore"><a class="load" href="#">点击加载更多</a><a class="totop" href="#"  onclick="window.scrollTo(0,0);return false;"><div><div class="totop_img"></div><div class="totop-text">回顶部</div></div></a></div>
+{% end %}
+

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+</script>
+{% end %}
+
+{% block body %}
+<div>
+    <h2>上传动态壁纸</h2>
+    <form enctype="multipart/form-data" method="POST">
+        {{ xsrf_form_html() }}
+        <input type="hidden" name="type" value="{{type}}" />
+        <table>
+            <tbody>
+                <tr><td>名称</td><td><input type="text" name="name"  required="required"/></td></tr>
+                <tr><td>作者</td><td><input type="text" name="author"  required="required"/></td></tr>
+                <tr><td>来源</td><td><input type="text" name="from"/></td></tr>
+                <tr><td>说明</td><td><input type="textarea" name="desc" required="required"/></td></tr>
+                <tr><td>标签</td><td><input type="text" name="tag"/></td></tr>
+                <tr><td>文件</td><td><input type="file" name="apk" required="required"/></td></tr>
+                <tr><td>截图</td><td><input type="file" name="thumb" required="required"/></td></tr>
+                <tr><td></td><td><input type="file" name="thumb" required="required"/></td></tr>
+                {% if type == 2 %}
+                <tr><td></td><td><input type="file" name="thumb" required="required"/></td></tr>
+                <tr><td></td><td><input type="file" name="thumb" required="required"/></td></tr>
+                <tr><td></td><td><input type="file" name="thumb" required="required"/></td></tr>
+                {% end %}
+                <input type="hidden" name="cateid" value="{{ category['_id'] }}" />
+                <tr><td></td><td><input type="submit" class="button primary" value="提交"/><input type="button" class="button" value="取消" onClick="history.back()"/></td></tr>
+            </tbody>
+        </table>
+        <br><label>注意：动态壁纸只需有上传2张，主题至少上传2张，最多6张</label>
+    </form>
+</div>
+
+{% end %}

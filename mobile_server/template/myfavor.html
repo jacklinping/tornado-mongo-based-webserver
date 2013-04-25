@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+{% if referer=='/personal' %}
+<h1 id="header"><a class="toBack" href="{{referer}}#t1:7">返 回</a>我喜欢的</h1>
+{% else %}
+<h1 id="header"><a class="toBack" href="{{referer}}#t1:7">返 回</a>Ta喜欢的</h1>
+{% end %}
+{% end %}
+
+{% block body %}
+<div class="zjdetail pd_b">
+    <span><ul>
+        {% if curpaper %}
+        <a href="/paperfavorlist/{{userid}}"><li><img src="http://{{context['static_server']}}/download/{{curpaper['fobjs']['300x225']}}" class="fl" />壁纸<br/><span>喜欢 {{papercount}}</span></li></a>
+        {% else %}
+        <a href="/paperfavorlist/{{userid}}"><li><img src="{{context['cdn']}}/images/paper.jpg" class="fl" />壁纸<br/><span>喜欢 {{papercount}}</span></li></a>
+        {% end %}
+        {% if curlive %}
+        <a href="/livefavorlist/{{userid}}"><li><img src="http://{{context['static_server']}}/thumbnail/{{curlive['thumbid'][0]}}" class="fl" />动态壁纸<br/><span>喜欢 {{livecount}}</span></li></a>
+        {% else %}
+        <a href="/livefavorlist/{{userid}}"><li><img src="{{context['cdn']}}/images/live.jpg" class="fl" />动态壁纸<br/><span>喜欢 {{livecount}}</span></li></a>
+        {% end %}
+    </ul></span>
+</div>
+{% end %}

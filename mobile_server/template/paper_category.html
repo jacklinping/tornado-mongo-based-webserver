@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+$(document).ready(function(){
+	$(".scale43").each(function(){
+		w = $(this).width();
+		$(this).height(w*3/4);
+	});
+});
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block banner %}
+{% end %}
+
+{% block body %}
+<body>
+<h1 id="header"><a class="toBack" href="/#t1:7">返 回</a>壁纸</h1>
+<div class="cate_t bg1"><span class="bg1"><a href="paperCate" class="now">分类</a><a href="/paperdirCate">专辑</a></span></div>
+<ul class="category pd_b">
+    {% for i in cates %}
+        {% if context['se']['channel'] == 'jifeng' and str(i['_id']) == '4e4d610cdf714d2966000003' %}
+            <li></li>
+        {% else %}
+            <li>
+            <a href="/paperList?cid={{i['_id']}}">
+                {% if i['cover'] %}
+                    {% if net == 'pc' %}
+                    <span class="srname">{{i['name']}}</span>{{i['rname']}}<br/><img src="http://{{context['static_server']}}/download/{{i['cover']['fobjs']['640x480']}}" class="scale43" /></a>
+                    {% elif net == 'wifi' %}
+                    <span class="srname">{{i['name']}}</span>{{i['rname']}}<br/><img src="http://{{context['static_server']}}/download/{{i['cover']['fobjs']['300x225']}}" class="scale43" /></a>
+                    {% else %}
+                    <span class="srname">{{i['name']}}</span>{{i['rname']}}<br/><img src="http://{{context['static_server']}}/download/{{i['cover']['fobjs']['160x120']}}" class="scale43" /></a>
+                    {% end %}
+                {% else %}
+                        <img src=""/>
+                {% end %}
+           </li>
+        {% end %}
+    {% end %}
+</ul>
+{% end %}

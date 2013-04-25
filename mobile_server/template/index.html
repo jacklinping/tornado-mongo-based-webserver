@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block head %}
+<script src="{{context['cdn']}}/jquery.lazyload.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{context['cdn']}}/iscroll.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+var myScroll;
+var pageIndex =1;
+var inscreen = 1;
+var isScroll = false;
+var intervalID;
+var adlen = 1;
+var isfinishp=true;
+var isfinishl=true;
+var imgw = $(window).width();
+imgw = (imgw-40)*0.5;
+var imgh=imgw*3/4;
+function loadPaperCate()
+{
+    if(isfinishp==false)
+        return;
+    isfinishp=false;
+    var needKill = true;
+    var url = '/paperCate?jsoncallback=?&d='+Math.random();
+    var myAjaxCall = $.getJSON(url,function(resp){
+            needKill = false;
+            var len = resp.resp.length;
+            var html='';
+            for(i=0;i<len;i++)
+            {
+            html += "<li style='position:relative;'><a href='/paperList?cid="+resp.resp[i].id+"' style='padding:3px;padding-bottom:5px;margin:4px 0px 6px 8px;'><img class='lazy' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXo6Og4/a9sAAAACklEQVR4XmNgAAAAAgAB3p6PvwAAAABJRU5ErkJggg==' data-original='http://{{context['static_server']}}/download/"+resp.resp[i].thumbid+"' style='width:"+imgw+"px;height:"+imgh+"px;'></a><div class='cate_tip'>"+resp.resp[i].rname+"</div></li>";
+            }
+            $(".paperlist").append(html);
+            html=null;
+            $("img.lazy").lazyload({
+             });
+
+            isfinishp=true;
+            myAjaxCall=null;
+            resp=null;
+            return false;
+            });
+    setTimeout(function(){
+            if(needKill){
+            myAjaxCall.abort();
+            isfinishp=true;
+            myAjaxCall=null;
+            needKill=false;
+            }
+            },10000);
+    url=null;
+}
+function loadLiveCate()
+{
+    if(isfinishl==false)
+        return;
+    isfinishl=false;
+    var needKill = true;
+    var url = '/liveCate?jsoncallback=?&d='+Math.random();
+    var myAjaxCall = $.getJSON(url,function(resp){
+            needKill = false;
+            var len = resp.resp.length;
+            var html='';
+            for(i=0;i<len;i++)
+            {
+            html += "<li style='position:relative;'><a style='letter-spacing:3px;padding-bottom:5px;margin:4px 0px 6px 8px;' href='/liveList?cateid="+resp.resp[i].id+"'><img class='lazylive' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXo6Og4/a9sAAAACklEQVR4XmNgAAAAAgAB3p6PvwAAAABJRU5ErkJggg==' data-original='http://{{context['static_server']}}/thumbnail/"+resp.resp[i].thumbid+"?type=1' style='width:"+imgw+"px;height:"+imgh+"px;'></a><div class='cate_tip'>"+resp.resp[i].name+"</div></li>";
+            }
+            $(".livelist").append(html);
+            html=null;
+
+            $("img.lazylive").lazyload({
+             });
+            isfinishl=true;
+            myAjaxCall=null;
+            resp=null;
+            return false;
+            });
+    setTimeout(function(){
+            if(needKill){
+            myAjaxCall.abort();
+            isfinishl=true;
+            myAjaxCall=null;
+            needKill=false;
+            }
+            },10000);
+    url=null;
+}
+
+function runScroll()
+{
+    if(pageIndex+inscreen>adlen)
+    {
+        inscreen = -1;
+    }
+    else if(pageIndex+inscreen<1)
+    {
+        inscreen = 1;
+    }
+    isScroll = true;
+    pageIndex = pageIndex+inscreen;
+    myScroll.scrollToElement('li:nth-child('+(pageIndex)+')',500);
+}
+function loaded(){
+    myScroll = new iScroll('wrapper', {
+        snap: true,
+        momentum:false,
+        hScrollbar:false,
+        onScrollStart:function()
+        {
+           if(!isScroll)
+           {
+                 clearInterval(intervalID);
+                 intervalID = setInterval(runScroll,8000);
+                 }
+         },
+
+        onScrollEnd:function(){
+            if(!isScroll)
+        {
+            pageIndex = parseInt(this.currPageX)+1;
+        }
+        isScroll = false;
+        document.querySelector('#indicator > li.active').className='';
+        document.querySelector('#indicator > li:nth-child('+(pageIndex)+')').className='active';
+        }
+    });
+    intervalID=setInterval(runScroll,5000);
+}
+//document.addEventListener('DOMContentLoaded', loaded, false);
+function dynamicLoad()
+{
+        $("#scroller").css("display","block");
+        $("#nav").css("display","block");
+        loaded();
+}
+function loadMore(e)
+{
+    $(".navigation").removeClass("now");
+    if($(this).hasClass("paper"))
+    {
+        $(".paperlist").show();
+        $(".livelist").hide();
+        $(".msgdiv").hide();
+        if($(".paperlist").has("li")==null)
+        {
+            loadPaperCate();
+        }
+    }
+    else
+    {
+        $(".msgdiv").show();
+        $(".paperlist").hide();
+        $(".livelist").show();
+        var d = $(".livelist").has("li");
+        if($(".livelist").has("li").length<1)
+        {
+            loadLiveCate();
+        }
+    }
+    $(this).addClass("now");
+    return false;
+}
+
+$(function(){
+        var bnimgw=$(window).width();
+        var len={{adlen}};
+        $(".livelist").hide();
+        adlen = parseInt(len);
+        $("#scroller").width(bnimgw*len);
+        $("#thelist li").width(bnimgw);
+        $("#nav").css("margin-left",bnimgw-100);
+        var bnimgh = bnimgw*4/9;
+        $("#wrapper").height(bnimgh);
+        $("#wrapper").width(bnimgw);
+        $(".navigation").unbind("click");
+        $(".navigation").bind("click",loadMore);
+        //loadPaperCate();
+        $("img.lazy").width(imgw);
+        $("img.lazy").height(imgh);
+        $("img.lazy").lazyload({
+         });
+});
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+
+{% end %}
+
+{% block body %}
+<body onload="dynamicLoad()">
+    <div id="wrapper">
+        <div id="scroller" style="display:none">
+        <ul id="thelist">
+            {% for i in adlist %}
+            <li><a href="{{i['url']}}"><img style='width:100%;' src="http://{{context['static_server']}}/thumbnail/{{i['imgid']}}"></a></li>
+            {% end %}
+        </ul>
+        </div>
+     </div>
+     <div id="nav" style="display:none">
+         <ul id="indicator">
+             {% for i in xrange(1,adlen+1) %}
+                 {% if i==1 %}
+                 <li class="active">1</li>
+                 {% else %}
+                 <li>{{i}}</li>
+                 {% end %}
+             {% end %}
+         </ul>
+     </div>
+
+ <div class="cate_t bg1"><span class="bg1"><a class="navigation now paper" href="#" style="height:46px;position:relative;">壁纸<div class="ca_bar_1"></div><div class="ca_bar_2"></div></a><a class="navigation live" style="height:46px;line-height:51px;" href="#">动态壁纸</a></span>
+ </div>
+ <ul class="category pd_b paperlist">
+    {% for i in cates %}
+        <li style='position:relative;'><a href='/paperList?cid={{i['id']}}' style='padding:3px;padding-bottom:5px;margin:4px 0px 6px 8px;'><img class='lazy' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXo6Og4/a9sAAAACklEQVR4XmNgAAAAAgAB3p6PvwAAAABJRU5ErkJggg==' data-original='http://{{context['static_server']}}/download/{{i['thumbid']}}'></a><div class='cate_tip'>{{i['rname']}}</div></li>
+    {% end %}
+ </ul>
+ <ul class="category pd_b livelist"></ul>
+
+
+</body>
+{% end %}

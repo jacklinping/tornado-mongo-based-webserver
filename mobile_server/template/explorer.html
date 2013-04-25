@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+var isfinish=true;
+var imgArray = []; //图片文件名数组，带路径
+var typeArray = []; //图片类型数组，0=壁纸，1=动态，2=主题
+var linkArray = []; //图片对应链接数组
+var imgew = parseInt(($(window).width()-16)*0.33);
+var imgh43=imgew*3/4;
+var imgh35=imgew*5/3;
+var skipnum=0;
+var ordervalue;
+var imgw = ($(window).width()-40)*0.32;
+var imgh = imgw*3/4;
+
+$.fn.loadimg = function(){
+	h = "";
+	for(i=0; i<imgArray.length; i++)
+	{
+		link = (linkArray[i])? linkArray[i] : "#";
+		switch(typeArray[i]){
+		case 0:
+			h = '<li><a href="'+ link +'"><img src="'+ imgArray[i] +'" style="width:'+imgew+'px;height:'+imgh43+'px;"></a></li>';
+			break;
+		case 1:
+			h = '<li><span>动态</span><a href="'+ link +'"><img src="'+ imgArray[i] +'" style="width:'+imgew+'px;height:'+imgh35+'px;"></a></li>';
+			break;
+		case 2:
+			h = '<li><span>主题</span><a href="'+ link +'"><img src="'+ imgArray[i] +'" class="scale35"></a></li>';
+			break;
+		}
+		n = i % 3 + 1;
+		$("#findlist" + n).append(h);
+	}
+};
+function loadExpMore()
+{
+    $("#findlist1").empty();
+    $("#findlist2").empty();
+    $("#findlist3").empty();
+
+    if(isfinish==false)
+        return;
+    isfinish=false;
+    var url ='/explorerMore?jsoncallback=?&d='+Math.random();
+    $(".rmore").html('加载中...');
+    $.getJSON(url,function(resp){
+            if(resp.live.length>5 && resp.paper.length>10)
+            {
+            imgArray.splice(0);
+            linkArray.splice(0);
+            typeArray.splice(0);
+            //1
+            imgArray.push(resp.live[0].src);
+            linkArray.push(resp.live[0].href);
+            typeArray.push(1);
+
+            imgArray.push(resp.paper[0].src);
+            linkArray.push(resp.paper[0].href);
+            typeArray.push(0);
+
+            imgArray.push(resp.paper[1].src);
+            linkArray.push(resp.paper[1].href);
+            typeArray.push(0);
+            //2
+            imgArray.push(resp.paper[2].src);
+            linkArray.push(resp.paper[2].href);
+            typeArray.push(0);
+
+            imgArray.push(resp.paper[3].src);
+            linkArray.push(resp.paper[3].href);
+            typeArray.push(0);
+
+            imgArray.push(resp.live[1].src);
+            linkArray.push(resp.live[1].href);
+            typeArray.push(1);
+            //3
+            imgArray.push(resp.paper[4].src);
+            linkArray.push(resp.paper[4].href);
+            typeArray.push(0);
+
+            imgArray.push(resp.paper[5].src);
+            linkArray.push(resp.paper[5].href);
+            typeArray.push(0);
+
+            imgArray.push(resp.paper[6].src);
+            linkArray.push(resp.paper[6].href);
+            typeArray.push(0);
+            //4
+            imgArray.push(resp.paper[7].src);
+            linkArray.push(resp.paper[7].href);
+            typeArray.push(0);
+
+            imgArray.push(resp.live[2].src);
+            linkArray.push(resp.live[2].href);
+            typeArray.push(1);
+
+            imgArray.push(resp.paper[8].src);
+            linkArray.push(resp.paper[8].href);
+            typeArray.push(0);
+            //5
+            imgArray.push(resp.paper[9].src);
+            linkArray.push(resp.paper[9].href);
+            typeArray.push(0);
+
+            imgArray.push(resp.paper[10].src);
+            linkArray.push(resp.paper[10].href);
+            typeArray.push(0);
+
+            imgArray.push(resp.live[3].src);
+            linkArray.push(resp.live[3].href);
+            typeArray.push(1);
+            //6
+            imgArray.push(resp.live[4].src);
+            linkArray.push(resp.live[4].href);
+            typeArray.push(1);
+
+            imgArray.push(resp.paper[11].src);
+            linkArray.push(resp.paper[11].href);
+            typeArray.push(0);
+
+            imgArray.push(resp.paper[12].src);
+            linkArray.push(resp.paper[12].href);
+            typeArray.push(0);
+            //7
+            imgArray.push(resp.paper[13].src);
+            linkArray.push(resp.paper[13].href);
+            typeArray.push(0);
+
+            imgArray.push(resp.paper[14].src);
+            linkArray.push(resp.paper[14].href);
+            typeArray.push(0);
+
+            imgArray.push(resp.paper[15].src);
+            linkArray.push(resp.paper[15].href);
+            typeArray.push(0);
+            //8
+            imgArray.push(resp.paper[16].src);
+            linkArray.push(resp.paper[16].href);
+            typeArray.push(0);
+
+            imgArray.push(resp.live[5].src);
+            linkArray.push(resp.live[5].href);
+            typeArray.push(1);
+
+            imgArray.push(resp.paper[17].src);
+            linkArray.push(resp.paper[17].href);
+            typeArray.push(0);
+
+            $.fn.loadimg();
+            }
+
+            $(".rmore").html('点击刷新一下吧');
+            $(".rmore").show();
+            isfinish=true;
+            return false;
+            });
+    url=null;
+}
+
+function loadMore(e)
+{
+    loadImage(skipnum);
+    return false;
+}
+function loadImage(skip)
+{
+    if(isfinish==false)
+        return;
+    isfinish=false;
+    skipnum = parseInt(skip);
+    if(isNaN(skipnum))skipnum=0;
+    if(skip=='0')
+    {
+        $(".list").empty();
+    }
+    var url ='/moredirlist?skip='+skipnum+'&jsoncallback=?&d='+Math.random();
+    $(".load").html('加载中...');
+    var needKill=true;
+    var myAjaxCall=$.getJSON(url,function(resp){
+            needKill=false;
+            var len = resp.resp.length;
+            var html='';
+        for(i=0;i<len;i++)
+        {
+            html+="<a class='dir' href='/paperdirList?path="+resp.resp[i].dirid+"' style='padding:4px;'><li class='dir' style='width: 100%;'><img width=93 height=70 class='avatar' src='http://{{context['static_server']}}/download/"+resp.resp[i].image+"' ><div class='rname'><h4 style='white-space:nowrap;overflow:hidden; text-overfollow:elipsis'>"+resp.resp[i].rname+"</h4><span>"+resp.resp[i].descr+"</span></div><div style='float: right;font-size:13px;'><span style='color:gray'>关注</span><class='follower' style='color:gray;'>"+resp.resp[i].follow_num+"</span></div><div style='clear:both;'></div></li>";
+            skipnum++;
+        }
+        $(".list").append(html);
+        html=null;
+        $(".load").html('点击加载更多');
+        skipnum += resp.code;
+        len += resp.code;
+        if(len<10)
+        {
+        $(".load").html('没有更多啦！');
+           // $(".loadmore").hide();
+        }
+         $(".load").show();
+        isfinish=true;
+        myAjaxCall=null;
+        resp=null;
+        return false;
+    });
+
+    setTimeout(function(){
+            if(needKill){
+            myAjaxCall.abort();
+            $(".load").html('网络异常，再试一次');
+            isfinish=true;
+            myAjaxCall=null;
+            needKill=false;
+            }
+                },10000);
+    url=null;
+}
+function switchList(e)
+{
+    $(".more").removeClass("now");
+    $(this).addClass("now");
+    var order = $(this).attr("href");
+    if(order=='suggest')
+    {
+        $(".album").hide();
+        $(".suggest").show();
+    }
+    else
+    {
+        $(".album").show();
+        $(".suggest").hide();
+        if(skipnum<1)
+            loadImage(skipnum);
+    }
+    return false;
+}
+$(document).ready(function(){
+        $("#findlist1").width(imgew+4);
+        $("#findlist2").width(imgew+4);
+        $("#findlist3").width(imgew+4);
+        $(".album").hide();
+        loadExpMore();
+        $("a.rmore").unbind("click");
+        $("a.rmore").bind("click",loadExpMore);
+        $("a.lmore").unbind("click");
+        $("a.lmore").bind("click",loadMore);
+        $("a.more").unbind("click");
+        $("a.more").bind("click",switchList);
+        });
+
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block banner %}
+{% end %}
+
+{% block body %}
+<body>
+<div class="cate_t bg1">
+    <span class="bg1"><a class="now more" href="suggest" >推荐</a><a class="more rank" href="album">专辑</a></span>
+</div>
+<span class="suggest">
+<div id="findlist">
+	<ul id="findlist1"></ul>
+	<ul id="findlist2"></ul>
+	<ul id="findlist3"></ul>
+</div>
+<div class="loadmore"><a class="load rmore" href="#" style="text-align:center;width:100%;">点击刷新一下吧</a></div>
+</span>
+<span class="album">
+<ul class="list">
+</ul>
+<div class="loadmore"><a class="load lmore" href="#">点击加载更多</a><a class="totop" href="#"  onclick="window.scrollTo(0,0);return false;"><div><div class="totop_img"></div><div class="totop-text">回顶部</div></div></a></div>
+</span>
+</body>
+{% end %}

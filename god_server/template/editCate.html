@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+</script>
+{% end %}
+{% block location %}
+{{ message }}
+{% end %}
+{% block banner %}
+{% end %}
+
+{% block body %}
+
+<div>
+    <form enctype="multipart/form-data" method="POST">
+        {{ xsrf_form_html() }}
+        <table>
+            <tbody>
+                <tr>
+                    <td>分类名称</td>
+                    <td>
+                        <input type="text" name="name" value="{{ category['name'] }}" required="required" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>英文名称</td>
+                    <td>
+                        <input type="text" name="rname" value="{{ category['rname'] }}" required="required" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>分类封面</td>
+                    <td>
+                        <input type="file" name="thumb" value="thumb" /><br>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="submit" class="button primary" value="提交" />
+                    </td>
+                    <td>
+                        <input type="button" class="button" value="取消" onClick="history.back()"/>
+                    </td>
+                </tr>
+                <input type="hidden" name="cateid" value="{{ category['_id'] }}" />
+            </tbody>
+        </table>
+    </form>
+</div>
+
+{% end %}
+

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+    $(document).ready(function(){
+            $("a.downapk").bind("click",function(){
+                var aid=$(this).attr('id');
+                var url = '/addfavorite/'+aid+'?type=2&jsoncallback=?&d='+Math.random();
+                $.getJSON(url,function(resp){
+                    if(resp.code==0)
+                    {
+                        var rnum=$('#ranknum').html();
+                        rnum = rnum.split(" ")[1];
+                        rnum = parseInt(rnum);
+                        rnum+=1;
+                        $('#ranknum').html("热度 "+rnum);
+                    }
+                });
+                return false;
+                });
+            $("a.tmp").bind("click",function(){
+                var rnum = $('#ranknum').html();
+                rnum = rnum.split(" ")[1];
+                rnum = parseInt(rnum);
+                var href=$(this).attr("href");
+                if($(this).hasClass('disfav'))
+                    {
+                        $.getJSON(href,function(resp){
+                        });
+                        $(this).removeClass('disfav');
+                        $(this).removeClass('now');
+                        $(this).addClass('fav');
+                        $(this).html('收藏');
+                        $(this).attr('href','/favorite/{{apk['_id']}}?type=2#t10:{{apk['_id']}}#t0:1');
+                        rnum -= 1;
+                    }
+                 else if($(this).hasClass('fav'))
+                 {
+                    $.getJSON(href,function(resp){
+                        });
+                    $(this).removeClass('fav');
+                    $(this).addClass('now');
+                    $(this).addClass('disfav');
+                    $(this).html('取消收藏');
+                    $(this).attr('href','/disfavorite/{{apk['_id']}}?type=2#t11:{{apk['_id']}}#t0:1');
+                    rnum += 1;
+                 }
+            $('#ranknum').html("热度 "+rnum);
+            window.location.href=href;
+                return false;
+            });
+            });
+</script>
+{% end %}
+{% block location %}
+{% end %}
+
+{% block header %}
+<h1 id="header"><a class="toBack" href="/explorer#t1:7#t0:1">返 回</a></h1>
+{% end %}
+
+{% block body %}
+<ul class="detail pd_b dtdetail">
+    <li class="t">{{cname}}</li>
+    <li class="imgshow">
+    {% for ig in apk['thumbid'] %}
+    <span><img src="http://{{context['static_server']}}/thumbnail/{{ig}}?type=2" class="scale35" /></span>
+    {% end %}
+    </li>
+    <li class="hotnum">
+    {% if front>=0 %}
+    <a class="fl bg1" href="/expthemeDetail?skip={{front}}&cateid={{apk['cid']}}#t0:0"><img src="{{context['cdn']}}/images/lsign.png" /></a>
+    {% end %}
+    {% if end>=0 %}
+    <a class="fr bg1" href="/expthemeDetail?skip={{end}}&cateid={{apk['cid']}}#t0:0"><img src="{{context['cdn']}}/images/rsign.png" /></a>
+    {% end %}
+    <div><span id='ranknum'>热度 {{apk['rank']}}</span></div>
+    </li>
+
+    <table cellspacing="0" class="d_menu"><tr>
+        <td><a class='downapk' id='{{apk['_id']}}' href="http://apk.androidesk.com/{{apk['savepath']}}#t2:{{apk['name']}},theme#t0:1">下载安装</a></td>
+        {% if favstate==1 %}
+        <td><a class='disfav tmp now' href="/disfavorite/{{apk['_id']}}?type=2&referer={{referer}}#t11:{{apk['_id']}}#t0:1">取消收藏</a></td>
+        {% elif favstate==0 %}
+        <td><a class='fav tmp' href="/favorite/{{apk['_id']}}?type=2&referer={{referer}}#t10:{{apk['_id']}}#t0:1">收藏</a></td>
+        {% else %}
+        <td><a href="/login?next={{referer}}#t0:2">收藏</a></td>
+        {% end %}
+    </tr></table>
+    <li><ul>
+        <li class="t"><div class="txt">
+            名称：{{apk['name']}}<br>
+            {% if apk['author'] %}
+            作者：{{apk['author']}}<br>
+            {% end %}
+            {% if apk['origin'] %}
+            来源：{{apk['origin']}}<br>
+            {% end %}
+            描述：{{apk['descr']}}({{apk['package_size']}}M)
+        </div></li>
+        <li class="t"><div>标签</div></li>
+        {% for tag in tags %}
+            <li>{{tag['name']}}</li>
+        {%end %}
+    </ul></li>
+</ul>
+{% end %}
+{% block footer %}
+{% end %}

@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+    var skipnum;
+    var path;
+    var ordervalue;
+    var isfinish=true;
+    var imgw = ($(window).width()-16)*0.33;
+    var imgh=imgw*3/4;
+function loadImage(dirid,skip,order)
+{
+    if(isfinish==false)
+        return;
+    isfinish=false;
+    skipnum = parseInt(skip);
+    if(isNaN(skipnum))skipnum=0;
+    path = dirid;
+    ordervalue = order;
+    if(skip=='0')
+        $(".list").empty();
+    var needKill=true;
+    var url = '/moredirShowlist?path='+path+'&skip='+skipnum+'&order='+ordervalue+'&jsoncallback=?&d='+Math.random();
+    $(".load").html('加载中...');
+    var myAjaxCall=$.getJSON(url,function(resp){
+            needKill=false;
+            var len = resp.resp.length;
+            var html='';
+            for(i=0;i<len;i++)
+            {
+            html += "<li><a href='/paperDetail?imgid="+resp.resp[i].imgid+"&offset="+skipnum+"&act=dir&order="+ordervalue+"#t1:0#t0:0'><img src='http://{{context['static_server']}}/download/"+resp.resp[i].image+"' style='width:"+imgw+"px;height:"+imgh+"px;' />";
+            skipnum++;
+            }
+            $(".list").append(html);
+            html=null;
+            $(".load").html('点击加载更多');
+            if(len<18 || (len>18 && len<30))
+                $(".load").html('没有更多啦！');
+
+            $(".load").show();
+            isfinish=true;
+            myAjaxCall=null;
+            resp=null;
+            return false;
+            });
+    setTimeout(function(){
+            if(needKill){
+            myAjaxCall.abort();
+            $(".load").html('网络异常，再试一次');
+            isfinish=true;
+            myAjaxCall=null;
+            needKill=false;
+            }
+                },10000);
+    url=null;
+}
+function setURL(e)
+{
+    var hash; 
+    var curskip = $(this).attr('id');
+    curskip="#"+curskip;
+    window.location.hash=curskip;
+}
+function switchList(e)
+{
+    $(".more").removeClass("now");
+    $(this).addClass("now");
+    var order = $(this).attr("href");
+    loadImage('{{dir['_id']}}','0',order);
+    return false;
+}
+function loadMore(e)
+{
+    loadImage(path,skipnum,ordervalue);
+    return false;
+}
+$(document).ready(function(){
+        var tmp = parseInt({{skip}});
+        if(window.location.hash)
+        {
+            var hashstr = window.location.hash;
+            tmp = parseInt(hashstr.slice(1))
+        }
+        tmp = tmp-7;
+        if(tmp<0)
+            tmp=0;
+        if('{{order}}'=='rank')
+        {
+            $(".more").removeClass("now");
+            $(".rank").addClass("now");
+        }
+
+        loadImage('{{dir['_id']}}',tmp,'{{order}}');
+        $("a.more").unbind("click");
+        $("a.more").bind("click",switchList);
+        $("a.load").unbind("click");
+        $("a.load").bind("click",loadMore);
+        $(".next").click(function(){
+            var page=$(".pagetext").val();
+            page=parseInt(page);
+            skipnum=(page-1)*30;
+            if(skipnum<0)
+                skipnum=0;
+            $(".list").empty();
+            loadImage(path,skipnum,ordervalue);
+            });
+
+         $("a.fow").click(function() {
+             $.getJSON($(this).attr("href"), function(data) {
+                 });
+
+             var id = $(this).attr("id");
+
+             if ($(this).hasClass("follow")) {
+                 $(this).removeClass("follow");
+                 $(this).addClass("unfollow");
+                 $(this).attr("href", "/unfollowPaperdir?dirid={{dir['_id']}}#t14:"+"{{dir['_id']}}");
+                 $(this).html("取消关注");
+             } else {
+                 $(this).removeClass("unfollow");
+                 $(this).addClass("follow");
+                 $(this).attr("href", "/followPaperdir?dirid={{dir['_id']}}#t13:"+"{{dir['_id']}}");
+                 $(this).html("关注");
+             }
+            id=null;
+             return false;
+             });
+        });
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block banner %}
+{% end %}
+
+{% block body %}
+<body>
+    {% if id %}
+        {% if id != dir['uid'] %}
+            {% if not dir['follow'] %}
+            <h1 id="header"><a class="toBack" href="/paperdirCate#t1:7#t0:1">返 回</a><span>{{dir['rname']}}</span><a class="fow follow bcate" href="/followPaperdir?dirid={{dir['_id']}}#t13:{{dir['_id']}}">关注</a></h1>
+            {% else %}
+            <h1 id="header"><a class="toBack" href="/paperdirCate#t1:7#t0:1">返 回</a><span>{{dir['rname']}}</span><a class="fow unfollow bcate" href="/unfollowPaperdir?dirid={{dir['_id']}}#t14:{{dir['_id']}}">取消关注</a></h1>
+            {% end %}
+        {% else %}
+    <h1 id="header"><a class="toBack" href="/paperdirCate#t1:7#t0:1">返 回</a>{{dir['rname']}}</h1>
+        {% end %}
+    {% else %}
+    <h1 id="header"><a class="toBack" href="/paperdirCate#t1:7#t0:1">返 回</a><span>{{dir['rname']}}</span><a class="bcate" href="/login?next={{uri}}">&#12288关注&#12288</a></h1>
+    {% end %}
+
+    <div class="list_t" ><a href="/otherprofile/{{dir['uid']}}">
+            {% if user['avatar'] %}
+            <img src="http://{{context['static_server']}}/download/{{user['avatar']['thumb']}}" class="fl" width="40" height="40">
+            {% else %}
+            <img src="{{context['cdn']}}/images/logo2.png" class="fl" width="40" height="40">
+            {% end %}
+            <div>{{dir['nickname']}}</div></a></div>
+<ul class="list pd_b">
+</ul>
+<div class="loadmore"><a class="load" href="#">点击加载更多</a><a class="totop" href="#"  onclick="window.scrollTo(0,0);return false;"><div><div class="totop_img"></div><div class="totop-text">回顶部</div></div></a></div>
+
+</body>
+{% end %}

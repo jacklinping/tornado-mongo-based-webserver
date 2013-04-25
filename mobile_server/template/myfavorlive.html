@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+var skipnum;
+var uid;
+var width = $(window).width();
+var isfinish=true;
+var maxnum=18;
+var minnum=9;
+var imgw = parseInt((width-16)*0.33);
+var imgh = parseInt(imgw*5/3);
+
+function loadImage(userid,skip)
+{
+    if(isfinish==false)
+        return;
+    isfinish=false;
+    skipnum = parseInt(skip);
+    if(isNaN(skipnum)) skipnum=0;
+    uid = userid;
+    if(skip=='0')
+    {
+        $(".list").empty();
+    }
+    var url ='/morefavorlive?userid='+uid+'&skip='+skipnum+'&jsoncallback=?&d='+Math.random();
+    $(".load").html('加载中...');
+    var needKill=true;
+
+    var myAjaxCall= $.getJSON(url,function(resp){
+            needKill=false;
+            var len = resp.resp.length;
+            var html='';
+        for(i=0;i<len;i++)
+        {
+            html+="<li><a href='/liveFavor?skip="+skipnum+"&userid="+uid+"&liveid="+resp.resp[i]._id+"#t1:0#t0:0'><img src='http://{{context['static_server']}}/thumbnail/"+resp.resp[i].thumbid+"?type=1' style='width:"+imgw+"px;height:"+imgh+"px;'></a></li>";
+            skipnum++;
+        }
+        $(".list").append(html);
+        html=null;
+        if(resp.code>0)
+        {
+            skipnum += minnum-len;
+            len = minnum;
+        }
+        if(len<minnum || (len>minnum && len<maxnum))
+        {
+            $(".load").html('没有更多啦！');
+        }
+        else
+        {
+            $(".load").html('点击加载更多');
+        }
+        if(skipnum<1)
+        {
+            $(".loadmore").hide();
+            $(".list").html("好懒！什么都没收藏");
+        }
+        $(".load").show();
+        myAjaxCall=null;
+        resp=null;
+        isfinish=true;
+        return false;
+    });
+
+    setTimeout(function(){
+            if(needKill){
+            myAjaxCall.abort();
+            $(".load").html('网络异常，再试一次');
+            isfinish=true;
+            needKill=false;
+            myAjaxCall=null;
+            }
+                },10000);
+    url=null;
+}
+function loadMore(e)
+{
+    loadImage(uid,skipnum);
+    return false;
+}
+$(document).ready(function(){
+        var tmp = parseInt({{skip}});
+        tmp = tmp-3;
+        if(tmp<0)
+        {
+            tmp = 0;
+        }
+        loadImage('{{userid}}',tmp);
+        $("a.load").unbind("click");
+        $("a.load").bind("click",loadMore);
+        $(".next").click(function(){
+            $(".load").show();
+            var page = $(".pagetext").val();
+            page = parseInt(page);
+            skipnum = (page-1)*9;
+            if(skipnum<0)
+            {
+                skipnum=0;
+            }
+            $(".list").empty();
+            loadImage(uid,skipnum);
+            });
+        });
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+<h1 id="header"><a class="toBack" href="/myfavorite/{{userid}}#t1:7">返 回</a>喜欢-动态壁纸</h1>
+{% end %}
+
+{% block body %}
+<ul class="list pd_b">
+</ul>
+<div class="loadmore"><a class="load" href="#">点击加载更多</a><a class="totop" href="#"  onclick="window.scrollTo(0,0);return false;"><div><div class="totop_img"></div><div class="totop-text">回顶部</div></div></a></div>
+{% end %}
+

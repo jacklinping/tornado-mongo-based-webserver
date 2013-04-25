@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block head %}
+{% end %}
+
+{% block body %}
+<div class="side">
+    <div class="side_inside">
+        <ul>
+            <li><a href="/function/tag" class="now">热门标签</a></li>
+            <li><a href="javascript:if(confirm('小心操作，会影响所有用户，确定要进入?'))location='/function/version'">版本更新</a></li>
+        </ul>
+    </div>
+</div>
+<div class="main">
+    <div>
+        <a href="javascript:if(confirm('确定要清空吗?'))location='/function/clean_taglog'" class="button primary">清空今日热门标签</a>
+    </div>
+</div>
+{% end %}

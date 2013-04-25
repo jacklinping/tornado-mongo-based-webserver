@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+$(document).ready(function(){
+var w_w = ($(window).width()-20)*232/454, 
+    w_wh = w_w*218/232,
+    w_y = ($(window).width()-20)*222/454,
+    w_yh = w_y*7/15,
+    dh = w_wh-2*w_yh,
+    dv = $(window).width()-10-w_w-w_y,
+    w_x = ($(window).width()-30)/3, 
+    skip=0,
+    album_box,
+    album_header,
+    load_more;
+
+var tmp_section = $($('#suggest').children('.section')[0]) ;
+
+$('.section.three').children('.content').width(3*w_x+16);
+tmp_section.find('img.paper_co').width(w_w).height(w_w*218/232);
+tmp_section.find('img.live_co').width(w_y).height(w_y*7/15);
+tmp_section.find('.xtt').css('paddingBottom',dh+1+'px');
+tmp_section.find('.xxx').css('paddingRight',dv+'px');
+$('#suggest').children('.section.three').find('img').width(w_x).height(w_x*3/4);
+
+var showImage = function(data){
+  var info = '' ;
+  album_box = album_box || $('#album').find('.content');
+  $.each(data,function(i,j){
+
+   var src = 'http://{{context["static_server"]}}/download/'+j.image ;
+
+   info += '<a href="/paperdirList?path='+j.dirid+'"><div style="padding:10px 0px;margin:0 3px 0 3px;position:relative;overflow:hidden;border-bottom:1px solid #dedede;">'+
+'<div style="float:left;"><img src="'+src+'" width="93" height="70"></div>'+
+'<div style="float:left;margin-left: 5px;"><div style="font-size:17px;color:#5B5B5B;">'+j.rname+'</div><div style="color:#999;font-size:13px;">'+j.descr+'</div></div><div style="position:absolute;right:6px;top: 7px;color:grey;">关注'+j.follow_num+'</div></div></a>';
+
+  skip++;
+  });
+
+album_header.hide();
+album_box.append(info);
+return true;
+}
+
+var loadalbum = function(load){
+  album_header = album_header || $('#album').find('.header');
+  if(load) {
+    load_more = load_more || $('#album').find('.footer').find('.load_more');
+    $.ajax({   
+     url:'moredirlist?skip='+skip+'&jsoncallback=?&d='+Math.random(),  
+     dataType:'jsonp',  
+     jsonp:'callback',  
+     timeout:10000,
+     success:function(data){
+       if(data.resp.length>0){
+          if(showImage(data.resp)){
+            if(data.code == 1){
+              load_more.addClass('f_more').html('加载更多...').parent().show();
+            }else{
+              load_more.removeClass('f_more').html('没有更多啦!').parent().show();
+            }
+          }
+         
+       }else{}
+     },
+     error:function(){
+       album_header.html('网络异常,再试一次');
+       load_more.html('网络异常,再试一次');
+     }
+    });
+  }
+  return ;
+}
+
+$('.more').click(function(){
+  $('#'+$('.now').removeClass('now').attr('uid')).hide();
+  return $('#'+$(this).addClass('now').attr('uid')).show().children('.content').html()==''&&loadalbum($(this).attr('load'));
+;
+});
+
+$('.footer').click(function(){
+  if(load_more.hasClass('f_more')){
+    load_more.html('加载中...');
+    return loadalbum(true);
+  }
+  return;
+});
+
+});
+
+</script>
+<style type="text/css">
+</style>
+{% end %}
+{% block location %}
+{% end %}
+{% block banner %}
+{% end %}
+
+{% block body %}
+<body>
+<div class="cate_t bg1">
+    <span class="bg1"><a class="now more" href="#" uid="suggest" style="position:relative;" >推荐<div class="ca_bar_1"></div><div class="ca_bar_2"></div></a><a class="more rank" href="#" uid="album" load='true'>专辑</a></span>
+</div>
+
+<div id="suggest">
+  <div class="section" style="padding:20px 0;overflow:hidden;">
+    <div style="float:left;" class="xxx"><a href="/find_tag?name=_每周壁纸推荐#t0:2"><img class="paper_co" src="/static/images/paper_co.jpg"></a></div>
+    <div style="float:left;">
+      <div class="xtt"><a href="http://aoi.androidesk.com/liveDetail/4f9a8dbf0a2ae00353000026?skip=4&order=hot#t1:0#t0:0"><img class="live_co" src="/static/images/live_co.jpg"></a></div>
+      <div><a href="http://ex.mobmore.com/api/xpromo/wap?app_key=4e4a2bc6431fe312ef000010#t17"><img src="/static/images/apk_co.jpg" class="live_co"></a></div>
+    </div>
+  </div>
+
+  <div class="section three xx" style="position:relative;width:100%;" id="newbeauty">
+    <div class="header">
+      <div class="h_1">最新美图</div>
+      <div class="h_2">
+         <a style="color:#747474;" href="/newcommend">查看全部＞</a>
+      </div>
+    </div>
+    <div class="content" style="overflow:hidden;padding-bottom:10px;margin:0 auto;">
+      {% if context['se']['hd']==False %}
+        {% for k,i in enumerate(news) %}
+         {% if k==1 or k==4 %}
+         <div class="pic_center">
+             <a href="/newpaperDetail?imgid={{i['_id']}}&skip=-1"><img src="http://{{context['static_server']}}/download/{{ i['thumb_fobj'] }}" width="148" height="112"></a>
+         </div>
+         {% else %}
+         <div class="pic_l_r">
+           <a href="/newpaperDetail?imgid={{i['_id']}}&skip=-1"><img src="http://{{context['static_server']}}/download/{{ i['thumb_fobj'] }}" width="148" height="112"></a>
+         </div>
+         {% end %}
+        {% end %}
+      {% elif context['se']['net'] == 'pc' %}
+        {% for k,i in enumerate(news) %}
+          {% if k==1 or k==4 %}
+         <div class="pic_center">
+           <a href="/newpaperDetail?imgid={{i['_id']}}&skip=-1"><img src="http://{{context['static_server']}}/download/{{ i['fobjs']['640x480'] }}" width="148" height="112"></a>
+         </div>
+         {% else %}
+         <div class="pic_l_r">
+           <a href="/newpaperDetail?imgid={{i['_id']}}&skip=-1"><img src="http://{{context['static_server']}}/download/{{ i['fobjs']['640x480'] }}" width="148" height="112"></a>
+         </div>
+         {% end %}
+        {% end %}
+      {% else %}
+        {% for k,i in enumerate(news) %}
+          {% if k==1 or k==4 %}
+          <div class="pic_center">
+           <a href="/newpaperDetail?imgid={{i['_id']}}&skip=-1"><img src="http://{{context['static_server']}}/download/{{ i['fobjs']['160x120'] }}" width="148" height="112"></a>
+          </div>
+          {% else %}
+          <div class="pic_l_r">
+           <a href="/newpaperDetail?imgid={{i['_id']}}&skip=-1"><img src="http://{{context['static_server']}}/download/{{ i['fobjs']['160x120'] }}" width="148" height="112"></a>
+          </div>
+          {% end %}
+        {% end %}
+      {% end %}
+    </div>
+  </div>
+
+  <div class="section three" style="position:relative;">
+    <div class="s_bar_2"></div>
+    <div class="s_bar_1"></div>
+    <div class="header">
+      <div class="h_1">热门排行</div>
+      <div class="h_2">
+         <a style="color:#747474;" href="/hotcommend">查看全部＞</a>
+      </div>
+    </div>
+
+    <div class="content" style="overflow:hidden;margin:0 auto;">
+      {% if context['se']['hd']==False %}
+        {% for k,i in enumerate(hots) %}
+         {% if k==1 or k==4 %}
+         <div class="pic_center">
+             <a href="/newpaperDetail?imgid={{i['_id']}}&skip={{k}}&type=rank#t1:0#t0:0"><img src="http://{{context['static_server']}}/download/{{ i['thumb_fobj'] }}" width="148" height="112"></a>
+         </div>
+         {% else %}
+         <div class="pic_l_r">
+             <a href="/newpaperDetail?imgid={{i['_id']}}&skip={{k}}&type=rank#t1:0#t0:0"><img src="http://{{context['static_server']}}/download/{{ i['thumb_fobj'] }}" width="148" height="112"></a>
+         </div>
+         {% end %}
+        {% end %}
+      {% elif context['se']['net'] == 'pc' %}
+        {% for k,i in enumerate(hots) %}
+          {% if k==1 or k==4 %}
+         <div class="pic_center">
+             <a href="/newpaperDetail?imgid={{i['_id']}}&skip={{k}}&type=rank#t1:0#t0:0"><img src="http://{{context['static_server']}}/download/{{ i['fobjs']['640x480'] }}" width="148" height="112"></a>
+         </div>
+         {% else %}
+         <div class="pic_l_r">
+             <a href="/newpaperDetail?imgid={{i['_id']}}&skip={{k}}&type=rank#t1:0#t0:0"><img src="http://{{context['static_server']}}/download/{{ i['fobjs']['640x480'] }}" width="148" height="112"></a>
+         </div>
+         {% end %}
+        {% end %}
+      {% else %}
+        {% for k,i in enumerate(hots) %}
+          {% if k==1 or k==4 %}
+          <div class="pic_center">
+              <a href="/newpaperDetail?imgid={{i['_id']}}&skip={{k}}&type=rank#t1:0#t0:0"><img src="http://{{context['static_server']}}/download/{{ i['fobjs']['160x120'] }}" width="148" height="112"></a>
+          </div>
+          {% else %}
+          <div class="pic_l_r">
+              <a href="/newpaperDetail?imgid={{i['_id']}}&skip={{k}}&type=rank#t1:0#t0:0"><img src="http://{{context['static_server']}}/download/{{ i['fobjs']['160x120'] }}" width="148" height="112"></a>
+          </div>
+          {% end %}
+        {% end %}
+      {% end %}
+
+
+    </div>
+  </div>
+</div>
+
+
+<div id="album">
+<div class="header">加载中...</div>
+<div class="content"></div>
+<div class="footer">
+<div class="load_more">加载更多...</div>
+<div onclick="window.scrollTo(0,0);return false;" class="back_to_top_t">
+<div class="back_to_top_i"></div>
+<div>回顶部</div>
+</div>
+</a>
+</div>
+</div>
+
+</body>
+{% end %}

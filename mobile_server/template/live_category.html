@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+$(document).ready(function(){
+	$(".scale44").each(function(){
+		w = $(this).width();
+		$(this).height(w);
+	});
+});
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+<h1 id="header"><a class="toBack" href="/#t1:7">返 回</a>动态壁纸</h1>
+{% end %}
+
+{% block body %}
+<a href="/liveTips">
+<div style="background:#FFF6ED; border: 1px solid #FAEFE3; text-align: center; margin: 3px 0 0 0;padding: 3px;">
+    动态壁纸小贴士
+</div>
+</a>
+<ul class="category pd_b">
+    {% for item in cates %}
+    <li><a style="letter-spacing:0px;" href="/liveList?cateid={{item['_id']}}"><span class="srname">{{item['rname']}}</span>{{item['name']}}<br/><img src="http://{{context['static_server']}}/thumbnail/{{item['thumbid']}}?type=1" class="scale44" /></a></li>
+    {% end %}
+</ul>
+
+{% end %}

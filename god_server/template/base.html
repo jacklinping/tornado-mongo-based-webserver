@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            安卓壁纸后台--{% block title%}{% end %}
+        </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="robots" content="noindex,nofollow">
+        <meta name="googlebot" content="noimageindex">
+        <link rel="stylesheet" type="text/css" href="/static/css/style.css?v=20120107" media="screen" />
+        <script src="/static/js/jquery-1.7.2.min.js" type="text/javascript"></script>
+        <script src="/static/js/Calendar4.js" type="text/javascript"></script>
+    {% block head %}{% end %}
+</head>
+<body>
+<div class="top-nav">
+    <div class="bd">
+        <a id="logo" href="/">
+            <img src="/static/image/androidesk.png" alt="安卓壁纸">
+            安卓壁纸
+        </a>
+        <div class="top-nav-info">
+            {% if current_user %}
+                <a href="">{{ _(handler.session.nickname) }}</a>
+                <a href="/logout">退出登陆</a>
+            {% else %}
+                <a href="/login">登陆</a>
+            {% end %}
+        </div>
+        <div class="top-nav-items"></div>
+    </div>
+</div>
+<div id="wrapper">
+    {% if handler.message %}
+    <div style="color: red; padding: 3px; border: 1px solid #EEE">
+        {% block message %}{{ _(handler.message) }}{% end %}
+    </div>
+    {% end %}
+    {% if current_user %}
+        <div id="header">
+            <div id="hmenus">
+                <div class="nav mainnavs">
+                    <ul>
+                        {% if request.uri.startswith('/live') %}
+                            <li class="youarehere"><a href="/live/home">动态</a></li>
+                        {% else %}
+                            <li><a href="/live/home">动态</a></li>
+                        {% end %}
+
+                        {% if request.uri.startswith('/ads') %}
+                            <li class="youarehere"><a href="/ads/home">广告</a></li>
+                        {% else %}
+                            <li><a href="/ads/home">广告</a></li>
+                        {% end %}
+
+                        {% if request.uri.startswith('/feedback') %}
+                            <li class="youarehere"><a href="/feedback/list">反馈</a></li>
+                        {% else %}
+                            <li><a href="/feedback/list">反馈</a></li>
+                        {% end %}
+
+<!--                        {% if request.uri.startswith('/messagedeliver') %}-->
+<!--                            <li class="youarehere"><a href="/messagedeliver/home">消息推送</a></li>-->
+<!--                        {% else %}-->
+<!--                            <li><a href="/messagedeliver/home">消息推送</a></li>-->
+<!--                        {% end %}-->
+
+<!--                        {% if request.uri.startswith('/tag') %}-->
+<!--                            <li class="youarehere"><a href="/tag">标签</a></li>-->
+<!--                        {% else %}-->
+<!--                            <li><a href="/tag">标签</a></li>-->
+<!--                        {% end %}-->
+
+<!--                        {% if request.uri.startswith('/user') %}-->
+<!--                            <li class="youarehere"><a href="/user">用户</a></li>-->
+<!--                        {% else %}-->
+<!--                            <li><a href="/user">用户</a></li>-->
+<!--                        {% end %}-->
+
+                        {% if request.uri.startswith('/function') %}
+                            <li class="youarehere"><a href="/function/home">功能</a></li>
+                        {% else %}
+                            <li><a href="/function/home">功能</a></li>
+                        {% end %}
+                    </ul>
+                </div>
+            </div>
+            <div class="cl"></div>
+        </div>
+    {% else %}
+        <div style="margin: 10px 0">
+            <h1>请登陆</h1>
+        </div>
+    {% end %}
+    {% block body %}
+        {% if handler.message %}
+        <div class="message">
+            {{ handler.message }}
+        </div>
+        {% end %}
+    {% end %}
+    <div class="cl"></div>
+    <div class="footer">
+       ©2011-2012 安卓壁纸
+    </div>
+</div>
+</body>
+</html>

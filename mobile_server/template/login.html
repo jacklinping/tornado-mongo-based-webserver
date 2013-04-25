@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+$(document).ready(function(){
+    if('{{message}}'!='None')
+    {
+        try{
+            showToastClient('{{message}}');
+            }
+        catch(err){
+            alert('{{message}}');
+         }
+    }
+});
+
+function checkForm(){
+var email = $.trim($("#email").val()).toLowerCase();
+    $("#email").val(email.replace("＠", "@"));
+    $("#email").val($("#email").val().replace("﹫", "@"));
+$("#email").val($("#email").val().replace("。", "."));
+var msg ='';
+var emailStr = $("input[name=email]").val();
+var passwdStr = $("input[name=password]").val();
+if(emailStr.length <= 0 || passwdStr.length <=0){
+    msg = '邮箱或密码不能为空';
+    try{
+        showToastClient(msg);
+    }
+    catch(err){
+        alert(msg);
+    }
+    msg=null;
+    return false;
+}
+emailStr=null;
+passwdStr=null;
+email=null;
+return true;
+}
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+<h1 id="header"><a class="toBack" href="{{referer}}#t1:7#t0:1">返 回</a>登录</h1>
+{% end %}
+
+{% block body %}
+<form method="POST" onSubmit="return checkForm()">
+{{ xsrf_form_html() }}
+<ul class="login pd_b">
+    <li class="logo"><img style="background:#F3F3F3" src="{{context['cdn']}}/images/logo.png"></li>
+        <li class="mailsign"><dl><dt></dt><dd><input type="text" name="email" id="email" placeholder="邮箱" class="inputshow" /></dd></dl></li>
+        <li class="passwdsign"><dl><dt></dt><dd><input type="password" name="password" placeholder="密码" class="inputshow" /></dd></dl></li>
+        <li><input type="submit" value="登  录" /></li>
+        <li class="otheropera tr"><a href="/signup?referer={{referer_quote}}">我要注册</a>|<a href="/findpwd?referer={{referer}}">忘记密码</a><li>
+    </ul>
+</form>
+{% end %}

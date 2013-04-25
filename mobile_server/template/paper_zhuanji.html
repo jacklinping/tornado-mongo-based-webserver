@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+var skipnum;
+var uid;
+var isfinish=true;
+    var width = $(window).width();
+    var imgw = (width-40)*0.32;
+    var imgh = imgw*3/4;
+function loadImage(skip)
+{
+    if(isfinish==false)
+        return;
+    isfinish=false;
+    skipnum = parseInt(skip);
+    if(isNaN(skipnum))skipnum=0;
+    if(skip=='0')
+    {
+        $(".list").empty();
+    }
+    var url ='/moredirlist?skip='+skipnum+'&jsoncallback=?&d='+Math.random();
+    $(".load").html('加载中...');
+    var needKill=true;
+    var myAjaxCall=$.getJSON(url,function(resp){
+            needKill=false;
+            var len = resp.resp.length;
+            var html='';
+        for(i=0;i<len;i++)
+        {
+            html+="<a class='dir' href='/paperdirList?path="+resp.resp[i].dirid+"' style='padding:4px;'><li class='dir' style='width: 100%;'><img width=93 height=70 class='avatar' src='http://{{context['static_server']}}/download/"+resp.resp[i].image+"' ><div class='rname'><h4 style='white-space:nowrap;overflow:hidden; text-overfollow:elipsis'>"+resp.resp[i].rname+"</h4><span>"+resp.resp[i].descr+"</span></div><div style='float: right;font-size:13px;'><span style='color:gray'>关注</span><class='follower' style='color:gray;'>"+resp.resp[i].follow_num+"</span></div><div style='clear:both;'></div></li>";
+            skipnum++;
+        }
+        $(".list").append(html);
+        html=null;
+        $(".load").html('点击加载更多');
+        skipnum += resp.code;
+        len += resp.code;
+        if(len<10)
+        {
+        $(".load").html('没有更多啦！');
+           // $(".loadmore").hide();
+        }
+         $(".load").show();
+        isfinish=true;
+        myAjaxCall=null;
+        resp=null;
+        return false;
+    });
+
+    setTimeout(function(){
+            if(needKill){
+            myAjaxCall.abort();
+            $(".load").html('网络异常，再试一次');
+            isfinish=true;
+            myAjaxCall=null;
+            needKill=false;
+            }
+                },10000);
+    url=null;
+}
+function loadMore(e)
+{
+    loadImage(skipnum);
+    return false;
+}
+$(document).ready(function(){
+        var tmp = parseInt({{skip}});
+        tmp = tmp-3;
+        if(tmp<0)
+        {
+            tmp = 0;
+        }
+        loadImage(tmp);
+        $("a.load").unbind("click");
+        $("a.load").bind("click",loadMore);
+        $(".next").click(function(){
+            var page = $(".pagetext").val();
+            page = parseInt(page);
+            skipnum = (page-1)*10;
+            if(skipnum<0)
+            {
+                skipnum=0;
+            }
+            $(".list").empty();
+            loadImage(skipnum);
+            });
+        $(".totop").unbind("click");
+        $(".totop").click(function(){
+                $(document).scrollTop();
+                });
+        });
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block banner %}
+{% end %}
+
+{% block body %}
+<body>
+    <h1 id="header"><a class="toBack" href="/explorer#t1:7">返 回</a>专辑</h1>
+    <!--<div class="cate_t bg1"><span class="bg1"><a href="/paperCate">分类</a><a href="/paperdirCate" class="now">专辑</a></span></div>-->
+<ul class="list pd_b">
+</ul>
+<div class="loadmore"><a class="load" href="#">点击加载更多</a><a class="totop" href="#"  onclick="window.scrollTo(0,0);return false;"><div><div class="totop_img"></div><div class="totop-text">回顶部</div></div></a></div>
+{% end %}
+

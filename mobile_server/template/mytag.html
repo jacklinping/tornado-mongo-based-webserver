@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+{% if referer=='/personal' %}
+<h1 id="header"><a class="toBack" href="{{referer}}#t1:7">返 回</a>我的标签</h1>
+{% else %}
+<h1 id="header"><a class="toBack" href="{{referer}}#t1:7">返 回</a>Ta的标签</h1>
+{% end %}
+{% end %}
+
+{% block body %}
+<ul class="mylabel">
+        {% for t in tags %}
+        <li><a class="tag" href="/find_tag?name={{t['name']}}&uri={{uri}}">{{t['name']}}</a>x{{t['rank']}}</li>
+        {% end %}
+        {% if tags.count()<1 %}
+        <span>好懒！什么标签都没创建</span>
+        {% end %}
+</ul>
+{% end %}

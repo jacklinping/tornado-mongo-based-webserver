@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+    $(document).ready(function(){
+            if('{{message}}'!='None')
+            {
+                alert('{{message}}');
+            }
+            });
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+<h1 id="header">重置密码</h1>
+{% end %}
+
+{% block body %}
+<h4>{{message}}</h4>
+<form method="POST">
+    {{ xsrf_form_html() }}
+    <ul class="login pd_b">
+        <li class="logo"><img style="background:#f3f3f3;" src="{{context['cdn']}}/images/logo.png" /></li>
+        <li class="mailsign"><dl><dt></dt><dd><input type="text" name="email" placeholder="您的邮箱" class="inputshow" /></dd></dl></li>
+        <li><input type="submit" value="确  定" /></li>
+    </ul>
+</form>
+{% end %}

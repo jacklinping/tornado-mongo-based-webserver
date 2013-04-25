@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block head %}
+{% end %}
+
+{% block body %}
+<div class="side">
+    <div class="side_inside">
+        <ul>
+            <li><a href="/ads/home" class="now">新版</a></li>
+            <li><a href="/ads/old">老版</a></li>
+        </ul>
+    </div>
+</div>
+<div class="main">
+    {% if request.uri.startswith('/ads/home') %}
+    <div>
+        <span style="float: left;"><h3>首页广告</h3></span>
+        <span style="float: right;">
+            <a class="button primary green" href="/ads/home/create">添加新广告</a>
+        </span>
+        <div style="clear:both;"></div>
+    </div>
+    <table class="tb">
+        <tbody>
+            <tr style="font-weight: bold;font-size:130%;"><td>排序号</td><td>跳转网址</td><td>图片预览</td><td>操作</td></tr>
+        {% for i in ads %}
+        <tr>
+            <td>{{ i['rank'] }}</td>
+            <td>{{ i['url'] }}</td>
+            <td><a href="/download/{{ i['imgid'] }}"><img width="120" height="80" src="/download/{{ i['imgid'] }}"></a></td>
+            <td><a class="button" href="/ads/home/edit/{{ i['_id'] }}">编辑</a></td>
+            <td><a class="button" href="/ads/home/delete/{{ i['_id'] }}">删除</a></td>
+        </tr>
+        {% end %}
+        </tbody>
+    </table>
+    {% else %}
+    {% end %}
+</div>
+{% end %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block head %}
+{% end %}
+
+{% block body %}
+<div class="main4message">
+    {% if request.uri.startswith('/messagedeliver/home') %}
+    <div>
+        <span style="float: left;"><h3>消息推送</h3></span>
+        <span style="float: right;">
+            <a class="button primary green" href="/messagedeliver/create">添加新消息</a>
+        </span>
+        <div style="clear:both;"></div>
+    </div>
+    <table class="tb">
+        <tbody>
+            <tr style="font-weight: bold;font-size:100%;">
+                <td>编号</td>
+                <td>标题</td>
+                <td>内容</td>
+                <td>跳转网址</td>
+                <td>开始日期</td>
+                <td>结束日期</td>
+                <td>时间</td>
+                <td>操作</td>
+                <td></td>
+                <td>修改时间</td>
+            </tr>
+        {% for i in messages %}
+        <tr>
+            <td>{{ i['_id'] }}</td>
+            <td>{{ i['title'] }}</td>
+            <td>{{ i['content'] }}</td>
+            <td><a href={{ i['link'] }}>{{ i['link'] }}</a></td>
+            <td>{{ i['datefrom'] }}</td>
+            <td>{{ i['dateto'] }}</td>
+            <td>{{ i['time'] }}</td>
+            <td><a class="button primary blue" href="/messagedeliver/edit?mid={{ i['_id'] }}">编辑</a></td>
+            <td><a class="button  primary red" href="/messagedeliver/delete?mid={{ i['_id'] }}">删除</a></td>
+            <td>{{ i['atime'] }}</td>
+        </tr>
+        {% end %}
+        </tbody>
+    </table>
+    {% else %}
+    {% end %}
+</div>
+{% end %}

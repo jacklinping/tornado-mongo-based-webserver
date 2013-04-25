@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block head %}
+{% end %}
+
+{% block body %}
+<div class="main">
+    <ul style="margin: 10px; border: 1px solid #DDD">
+        {% for i in errorlog%}
+        <li style="margin: 10px; border: 1px solid #DDD">
+        <span>{{ i['datetime'] }}| {{ i['ua']}}| {{ i['email']}}</span><br>
+        <span>{{ i['feedContent'] }}</span>
+        </li>
+        {% end %}
+    </ul>
+</div>
+{% end %}

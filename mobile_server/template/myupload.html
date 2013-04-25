@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+var skipnum;
+var uid;
+var isfinish=true;
+var width = $(window).width();
+var imgw = parseInt((width-16)*0.33);
+var imgh = parseInt(imgw*3/4);
+
+function loadImage(userid,skip)
+{
+    if(isfinish==false)
+        return;
+    isfinish=false;
+    skipnum = parseInt(skip);
+    if(isNaN(skipnum))skipnum=0;
+    uid = userid;
+    if(skip=='0')
+    {
+        $(".list").empty();
+    }
+    var url ='/moreupload?userid='+uid+'&skip='+skipnum+'&jsoncallback=?&d='+Math.random();
+    $(".load").html('加载中...');
+    var needKill=true;
+    var myAjaxCall=$.getJSON(url,function(resp){
+            needKill=false;
+            var len = resp.resp.length;
+            var html='';
+        for(i=0;i<len;i++)
+        {
+        html+="<li><a href='/paperUpload?imgid="+resp.resp[i].imgid+"&offset="+resp.resp[i].offset+"&userid="+resp.userid+"#t1:0#t0:0'><img src='http://{{context['static_server']}}/download/"+resp.resp[i].image+"' style='width:"+imgw+"px;height:"+imgh+"px;'></a></li>";
+        skipnum++;
+        }
+        $(".list").append(html);
+        html=null;
+        $(".load").html('点击加载更多');
+        if(len<18 || (len>18 && len<30))
+        {
+        $(".load").html('没有更多啦！');
+           // $(".loadmore").hide();
+        }
+        if(skipnum<1)
+        {
+            $(".loadmore").hide();
+            $(".list").html("您还未创建任何专辑，电脑登陆up.androidesk.com即可上传！");
+        }
+        $(".load").show();
+        isfinish=true;
+        myAjaxCall=null;
+        resp=null;
+        return false;
+    });
+
+    setTimeout(function(){
+            if(needKill){
+            myAjaxCall.abort();
+            $(".load").html('网络异常，再试一次');
+            isfinish=true;
+            myAjaxCall=null;
+            needKill=false;
+            }
+                },10000);
+
+    url=null;
+}
+function setURL(e)
+{
+    var hash; 
+    var curskip = $(this).attr('id');
+    curskip="#"+curskip;
+    window.location.hash=curskip;
+}
+function loadMore(e)
+{
+    loadImage(uid,skipnum);
+    return false;
+}
+$(document).ready(function(){
+        var tmp = parseInt({{skip}});
+        if(window.location.hash)
+        {
+            var hashstr = window.location.hash;
+            tmp = parseInt(hashstr.slice(1))
+        }
+        tmp = tmp-7;
+        if(tmp<0)
+        {
+            tmp = 0;
+        }
+        loadImage('{{userid}}',tmp);
+        $("a.load").unbind("click");
+        $("a.load").bind("click",loadMore);
+        $(".next").click(function(){
+            var page = $(".pagetext").val();
+            page = parseInt(page);
+            skipnum = (page-1)*30;
+            if(skipnum<0)
+            {
+                skipnum=0;
+            }
+            $(".list").empty();
+            loadImage(uid,skipnum);
+            });
+        });
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+{% if referer=='/personal' %}
+<h1 id="header"><a class="toBack" href="{{referer}}#t1:7">返 回</a>我的上传</h1>
+{% else %}
+<h1 id="header"><a class="toBack" href="{{referer}}#t1:7">返 回</a>Ta的上传</h1>
+{% end %}
+{% end %}
+
+{% block body %}
+<ul class="list pd_b">
+</ul>
+<div class="loadmore"><a class="load" href="#">点击加载更多</a><a class="totop" href="#"  onclick="window.scrollTo(0,0);return false;"><div><div class="totop_img"></div><div class="totop-text">回顶部</div></div></a></div>
+{% end %}
+

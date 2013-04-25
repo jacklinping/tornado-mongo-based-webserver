@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block head %}
+{% end %}
+
+{% block body %}
+<div class="side">
+    <div class="side_inside">
+        <ul>
+            <li><a href="/function/tag">热门标签</a></li>
+            <li><a href="javascript:if(confirm('小心操作，会影响所有用户，确定要进入?'))location='/function/version'">版本更新</a></li>
+        </ul>
+    </div>
+</div>
+<div class="main">
+    <h2 style="color:red">版本更新</h2>
+    <form method="POST">
+        {{ xsrf_form_html() }}
+        <table class="long">
+            <tbody>
+                <tr><td>更新包地址</td><td><input type="text" id="apk_url" name="apk_url" value="{{ apk_url }}" required="required"></td></tr>
+                <tr><td>版本号</td><td><input type="number" id="version_code" name="version_code" value="{{ version_code }}"required="required"></td></tr>
+                <tr><td>更新内容</td><td><textarea id="update_notice" name="update_notice">{{ update_notice }}</textarea></td></tr>
+                <tr><td></td><td><input id="force_update" type="checkbox" name="force_update"><span>强制用户更新</span></td></tr>
+                <tr><td></td><td><input type="submit" class="button primary"  value="提交"></td></tr>
+                </tbody>
+            </table>
+    </form>
+</div>
+{% end %}

@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+var cate;
+var pskipnum;
+var lskipnum;
+var tskipnum;
+var word;
+var step;
+var isfinish=true;
+var maxnum=18;
+var imgArray = []; //图片文件名数组，带路径
+var typeArray = []; //图片类型数组，0=壁纸，1=动态，2=主题
+var linkArray = []; //图片对应链接数组
+var listn = 0;
+var imgw = ($(window).width()-18)*0.33;
+var imgh = imgw/4*3;
+var liveh = imgh*2+4;
+
+function loadImage(type,keywords)
+{
+    window.location.href='/searchlist?keyword='+keywords+'&type='+type;
+}
+function loadMore()
+{
+    loadImage(cate,word);
+    return false;
+}
+function searchType(e)
+{
+    var keyword = $("input[name=keyword]").val();
+    listn=0;
+    $("#findlist1").empty();
+    $("#findlist2").empty();
+    $("#findlist3").empty();
+    $(".type").each(function(){
+        $(this).removeClass("now");
+    });
+    $(this).addClass("now");
+    var type= $(this).attr("href");
+    cate = type;
+    if(!keyword || keyword.length<1)
+        return false;
+    loadImage(cate,keyword);
+    return false;
+}
+function searchTag(e)
+{
+    var keyword = $(this).attr("href");
+    $("input[name=keyword]").val(keyword);
+    cate = 'all';
+    loadImage(cate,keyword);
+    return false;
+}
+
+$(document).ready(function(){
+        step = 27;
+        $("#findlist1").width(imgw+4);
+        $("#findlist2").width(imgw+4);
+        $("#findlist3").width(imgw+4);
+
+    if('{{keyword}}'!=null && '{{keyword}}'.length>0)
+    {
+        $(".taglist").hide();
+        $(".load").show();
+        $(".searchilst").show();
+        cate='{{stype}}';
+        $(".type").each(function(){
+            $(this).removeClass("now");
+        });
+
+        $("input[name=keyword]").val('{{keyword}}');
+        loadImage(cate,'{{keyword}}');
+        }
+    else
+        $(".searchlist").hide();
+    $(".type").unbind("click");
+    $(".type").bind("click",searchType);
+    $("#search").click(function(){
+            $(".load").html('点击加载更多');
+            var keyword=$("input[name=keyword]").val();
+            if(keyword==null || keyword.length<1)
+                return;
+            $("#findlist1").empty();
+            $("#findlist2").empty();
+            $("#findlist3").empty();
+            if(cate==null)cate='all';
+            loadImage(cate,keyword);
+            });
+    $(".searchkey").unbind("click");
+    $(".searchkey").bind("click",searchTag);
+    $(".load").unbind("click");
+    $(".load").bind("click",loadMore);
+    $(".next").click(function(){
+            $(".load").show();
+            imgArray.splice(0);
+            linkArray.splice(0);
+            typeArray.splice(0);
+            listn=0;
+            $("#findlist1").empty();
+            $("#findlist2").empty();
+            $("#findlist3").empty();
+            if(cate==null)cate='all';
+            loadImage(cate,word);
+        });
+
+var t_clear,
+    search = $('input[name="keyword"]'),
+    window_w = $(window).width();
+
+ search.width(window_w-20-74).show();
+   
+search.keydown(function(e){
+  if(e.keyCode == 13 && $.trim($(this).val()).length>0){
+    return loadImage($('.type').attr('href'),$(this).val());
+  }
+  return ;
+}).focus(function(){
+     t_clear = t_clear || $('.t_clear');
+     if(search.val().length>0) return search.width(window_w-20-37-74) && t_clear.show();
+     return;
+  }).bind('input',function(){
+    return $(this).val().length==0 && (search.width(window_w-20-74) && t_clear.hide()) || (search.width(window_w-20-37-74) && t_clear.show());
+  });
+
+  $('.t_clear').click(function(){
+   return $(this).hide() && search.width(window_w-20-74).val('').focus();
+  });
+
+});
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+{% end %}
+
+{% block body %}
+<ul class="search">
+<li class="t" style="overflow:hidden;">
+<input type="text" name="keyword" style="display:none;float:left;outline:0;border:1px solid #B6B6B6;border-right:0;border-radius:0;border-top-left-radius:5px;border-bottom-left-radius:5px;">
+<input type="image" src="static/images/t_clear_32.png" class="t_clear" id="t_clear" style="float:left;background:white;border:0;padding:0;padding-bottom: 13px;padding-top: 10px;border:1px solid #B6B6B6;border-right:0;border-left:0;border-radius:0;padding-right:10px;width:17px;height:17px;padding-left:10px;display:none;">
+<input src="http://s.androidesk.com/aoi/images/searchsign.png" type="image" style="float:left;background:#F7F7F7;" id="search">
+</li>
+    <li class="searchcate bg1">
+        <table cellspacing="0"><tr>
+                <td><a class="type now" href="all">全部</a></td>
+                <td><a class="type tpaper" href="paper">壁纸</a></td>
+                <td><a class="type tlive" href="live">动态壁纸</a></td>
+                <!--                <td><a class="type ttheme" href="theme">桌面主题</a></td>-->
+        </tr></table>
+    </li>
+    <div class="taglist">
+        <!--    <li class="line"></li>  -->
+    <li class="subt">最近搜索</li>
+    <li class="txt">
+    {% for i in newtags %}
+    <a class="searchtag searchkey" href="{{i}}">{{i}}</a>
+    {% end %}
+    <br/>
+    </li>
+    <li class="subt">热门标签</li>
+    <li class="txt">
+    {% for i in hottags %}
+        <a class="searchtag" href="/find_tag?name={{i['name']}}#t0:2">{{i['name']}}</a>
+<!--<a class="searchtag" href="{{i['name']}}">{{i['name']}}</a>-->
+    {% end %}
+    <br/><br/>
+    </li>
+    </div>
+</ul>
+<div class="searchlist">
+    <div id="findlist">
+        <ul id="findlist1"></ul>
+        <ul id="findlist2"></ul>
+        <ul id="findlist3"></ul>
+    </div>
+<div class="loadmore"><a class="load" href="#">点击加载更多</a><a class="totop" href="#"  onclick="window.scrollTo(0,0);return false;"><div><div class="totop_img"></div><div class="totop-text">回顶部</div></div></a></div>
+</div>
+
+{% end %}

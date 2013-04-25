@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+<h1 id="header"><a class="toBack" href="/index#t1:7">返 回</a>桌面主题</h1>
+{% end %}
+
+{% block body %}
+<ul class="category pd_b">
+{% for item in cates %}
+<li><a href="/themeList?cateid={{item['_id']}}&skip=0"><span>{{item['rname']}}</span>{{item['name']}}<br/><img src="http://{{context['static_server']}}/thumbnail/{{item['thumbid']}}?type=2" class="scale43" /></a></li>
+{% end %}
+
+{% end %}
+

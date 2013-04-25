@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+</script>
+{% end %}
+{% block location %}
+{{ message }}
+{% end %}
+{% block banner %}
+{% end %}
+
+{% block body %}
+<div>
+    <form enctype="multipart/form-data" method="POST">
+        {{ xsrf_form_html() }}
+        <input type="hidden" name="type" value="{{type}}" />
+        <table>
+            <tbody>
+                <tr>
+                    <td>分类选择</td>
+                    <td>
+                        <select name="cateid" value="{{ apk['cid'] }}" >
+                            {% for cItem in categorys %}
+                            {% if cItem['_id'] == apk['cid'] %}
+                            <option value="{{ cItem['_id'] }}" selected="selected">{{ cItem['name'] }}</option>
+                            {% end %}
+                            {% if cItem['_id'] != apk['cid'] %}
+                            <option value="{{ cItem['_id'] }}">{{ cItem['name'] }}</option>
+                            {% end %}
+                            {% end %}
+                        </select>
+                    </td>
+                </tr>
+                <tr><td>名称</td><td><input type="text" name="name" value="{{apk['name']}}"/></td></tr>
+                <tr><td>作者</td><td><input type="text" name="author" value="{{apk['author']}}"/></td></tr>
+                <tr><td>来源</td><td><input type="text" name="from" value="{{apk['origin']}}"/></td></tr>
+                <tr><td>说明</td><td><input type="textarea" name="desc" value="{{apk['descr']}}"/></td></tr>
+                <tr><td>标签</td><td><input type="text" name="tag" value="{{tag}}"/></td></tr>
+                <tr><td>APK</td><td><input type="file" name="apk"/></td></tr>
+                <tr><td>截图</td><td><input type="file" name="thumb"/></td></tr>
+                <tr><td></td><td><input type="file" name="thumb"/></td></tr>
+                {% if type == 2 %}
+                <tr><td></td><td><input type="file" name="thumb"/></td></tr>
+                <tr><td></td><td><input type="file" name="thumb"/></td></tr>
+                <tr><td></td><td><input type="file" name="thumb"/></td></tr>
+                {% end %}
+                <tr><td></td><td><input type="submit" class="button primary" value="提交"/><input type="button" class="button" value="取消" onClick="history.back()"/></td></tr>
+            </tbody>
+        </table>
+    </form>
+
+<div>
+{% end %}

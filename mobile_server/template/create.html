@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+</script>
+{% end %}
+{% block loation %}
+{{message}}
+{% end %}
+{% block banner %}
+{% end %}
+
+{% block body %}
+<div>
+    <form method="POST">
+        {{ xsrf_form_html() }}
+        <input type="text" name="name" />
+        <input type="submit" value="提交" />
+    </form>
+</div>
+
+{% end %}

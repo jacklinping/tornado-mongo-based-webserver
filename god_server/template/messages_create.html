@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block head %}
+{% end %}
+
+{% block body %}
+<div class="main">
+    <form enctype="multipart/form-data" method="POST" action="/messagedeliver/create">
+        {{ xsrf_form_html() }}
+        <table class="long">
+            <tr><td>标题</td><td><input type="text" id="title" name="title" required="required"></td></tr>
+            <tr><td>内容</td><td><input type="text" id="content" name="content" required="required"></td></tr>
+            <tr><td>跳转网址</td><td><input type="text" id="link" name="link" required="required"></td></tr>
+            <tr><td>开始日期</td><td><input type="text" id="datefrom" name="datefrom" onclick="MyCalendar.SetDate(this)" placeholder="格式如:2012-06-06" ></td></tr>
+            <tr><td>结束日期</td><td><input type="text" id="dateto" name="dateto" onclick="MyCalendar.SetDate(this)" placeholder="格式如:2012-06-06" ></td></tr>
+            <tr><td>时间</td><td><input type="text" id="time" name="time"  placeholder="格式如:1330,表示13：30" ></td></tr>
+            <tr><td></td><td><input type="submit" class="button primary"  value="增加"></td></tr>
+        </table>
+    </form>
+</div>
+{% end %}

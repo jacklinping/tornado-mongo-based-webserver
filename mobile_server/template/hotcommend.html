@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+var skipnum=0;
+var path;
+var isfinish=true;
+var imgw = ($(window).width()-16)*0.33;
+var imgh=imgw*3/4;
+var apkh=imgw*5/3;
+var type='paper';
+
+function loadImage(skip)
+{
+    if(isfinish==false)
+        return;
+    isfinish=false;
+    skipnum = parseInt(skip);
+    if(isNaN(skipnum))skipnum=0;
+    if(skip=='0')
+        $(".list").empty();
+    var needKill=true;
+    url = '/morehpapercommend?skip='+skipnum+'&jsoncallback=?&d='+Math.random();
+    if(type=='live')
+        url = '/morehlivecommend?skip='+skipnum+'&jsoncallback=?&d='+Math.random();
+
+    $(".load").html('加载中...');
+    var myAjaxCall=$.getJSON(url,function(resp){
+            needKill=false;
+            var len = resp.resp.length;
+            var html='';
+            for(i=0;i<len;i++)
+            {
+            if(type=='paper')
+                html += "<li><a href='/newpaperDetail?imgid="+resp.resp[i].id+"&skip="+skipnum+"&type=rank#t1:0#t0:0'><img src='http://{{context['static_server']}}/download/"+resp.resp[i].image+"' style='width:"+imgw+"px;height:"+imgh+"px;' />";
+            else
+                html+="<li><a href='/newliveDetail?apkid="+resp.resp[i].id+"&skip="+skipnum+"&type=rank#t1:0#t0:0' ><img src='http://{{context['static_server']}}/thumbnail/"+resp.resp[i].thumbid+"?type=1' style='width:"+imgw+"px;height:"+apkh+"px;'></a></li>";
+
+            skipnum++;
+            }
+            $(".list").append(html);
+            html=null;
+            $(".load").html('点击加载更多');
+            if(len<9 || (len>9 && len<18))
+                $(".load").html('没有更多啦！');
+
+            $(".load").show();
+            isfinish=true;
+            myAjaxCall=null;
+            resp=null;
+            return false;
+            });
+    setTimeout(function(){
+            if(needKill){
+            myAjaxCall.abort();
+            $(".load").html('网络异常，再试一次');
+            isfinish=true;
+            myAjaxCall=null;
+            needKill=false;
+            }
+                },10000);
+    url=null;
+}
+function switchList(e)
+{
+    $(".more").removeClass("now");
+    $(this).addClass("now");
+    type = $(this).attr("href");
+    loadImage(0);
+    return false;
+}
+function loadMore(e)
+{
+    loadImage(skipnum);
+    return false;
+}
+$(document).ready(function(){
+        loadImage(0);
+        $("a.more").unbind("click");
+        $("a.more").bind("click",switchList);
+        $("a.load").unbind("click");
+        $("a.load").bind("click",loadMore);
+
+        });
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block banner %}
+{% end %}
+
+{% block body %}
+<h1 id="header"><a class="toBack" href="/explorer#t1:7#t0:1">返 回</a>热门排行</h1>
+<div class="cate_t bg1">
+<span class="bg1"><a href="paper" class="now more" style="position:relative;">壁纸<div class="ca_bar_1"></div><div class="ca_bar_2"></div></a><a href="live" class="more hot">动态壁纸</a></span>
+</div>
+<ul class="list pd_b">
+</ul>
+<div class="loadmore"><a class="load" href="#">点击加载更多</a><a class="totop" href="#"  onclick="window.scrollTo(0,0);return false;"><div><div class="totop_img"></div><div class="totop-text">回顶部</div></div></a></div>
+
+{% end %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+</script>
+{% end %}
+{% block location %}
+{{ message }}
+{% end %}
+{% block banner %}
+{% end %}
+
+{% block body %}
+<div>
+    <form method="POST">
+        <table cellpadding="5" cellspacing="0" border="0">
+            <tbody>
+                <tr>
+                    <td width="80" align="right" valign="top">邮箱</td>
+                    <td width="200" align="left">
+                        <input type="text" class="si" id="email" name="email" placeholder="输入你的邮箱" />
+                    </td>
+                </tr>
+                <tr>
+                    <td width="80" align="right" valign="top">密码</td>
+                    <td width="200" align="left">
+                        <input type="password" class="si" id="password" name="password" placeholder="输入你的密码" />
+                    </td>
+                </tr>
+                <tr>
+                    <td width="80" align="right" valign="top"></td>
+                    <td width="200" align="left">
+                        {{ xsrf_form_html() }}
+                        <input type="submit" class="button" value="登录" name="event_submit" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+<!--    <a style="float: right" class="active_link" href="/findpwd">忘记密码</a>-->
+<!--    <a style="float: left" class="active_link" href="/signup">注册帐号</a>-->
+</div>
+
+{% end %}

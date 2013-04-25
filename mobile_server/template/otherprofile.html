@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+<h1 id="header"><a class="toBack" href="/#t1:7#t0:1">返 回</a>{{user['nickname']}}</h1>
+{% end %}
+
+{% block body %}
+<ul class="zjdetail">
+    <li><img width="100%" src="http://{{context['static_server']}}/download/{{recent_imgid}}" class="scale32"></li>
+    <li class="t">{{user['nickname']}}
+    {% if user['avatar'] %}<br>
+    <img src="http://{{context['static_server']}}/download/{{user['avatar']['avatar']}}">
+    {% else %}<br>
+    <img src="{{context['cdn']}}/images/logo2.png">
+    {% end %}
+    <span>活跃度:{{user['rank']}}</span>
+</ul>
+<div class="manage pd_b">
+<ul>
+    <li><dl><dt><img src="{{context['cdn']}}/images/m12.png"></dt><dd><a href="/myfavorite/{{uid}}">Ta喜欢的</a></dd></dl></li>
+    <li><dl><dt><img src="{{context['cdn']}}/images/m13.png"></dt><dd><a href="/myattention/{{uid}}">Ta的关注</a></dd></dl></li>
+    <li><dl><dt><img src="{{context['cdn']}}/images/m15.png"></dt><dd><a href="/myalbum/{{uid}}">Ta的专辑</a></dd></dl></li>
+    <li><dl><dt><img src="{{context['cdn']}}/images/m16.png"></dt><dd><a href="/myupload/{{uid}}">Ta的上传</a></dd></dl></li>
+    <li><dl><dt><img src="{{context['cdn']}}/images/m17.png"></dt><dd><a href="/mytag/{{uid}}">Ta的标签</a></dd></dl></li>
+</ul>
+{% end %}

@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+    function checkForm()
+    {
+    	var email = $.trim($("#email").val()).toLowerCase();
+        $("#email").val(email.replace("＠", "@"));
+        $("#email").val($("#email").val().replace("﹫", "@"));
+        $("#email").val($("#email").val().replace("。", "."));
+
+        var msg='';
+        var emailStr = $("input[name=email]").val();
+	if(emailStr.length <= 0){
+		msg='邮箱不能为空'
+		try{
+			showToastClient(msg);
+		}
+		catch(err){
+			alert(msg);
+		}
+        msg=null;
+        return false;
+	}
+        //var emailPat = /^(.+)@(.+)$/;
+	var emailPat =  /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$/;
+        var matchArray = emailStr.match(emailPat);
+	          if(matchArray==null){
+             msg = '邮箱格式有误';
+            try{
+                showToastClient(msg);
+                }
+                catch(err){
+                    alert(msg);
+
+                }
+                msg=null;
+                emailPat=null;
+                matchArray=null;
+             return false;
+         }
+         var pwd = $("input[name=password]").val();
+         var pwd2 = $("input[name=password2]").val();
+	 if(pwd.length <= 0){
+		 msg = '密码不能为空';
+		 try{
+			showToastClient(msg);
+		 }
+		 catch(err){
+			 alert(msg);
+		 }
+		 return false;
+	 }
+	 if(pwd.length < 6 || pwd.length > 20){
+		msg = '密码为6-20位字母或数字';
+		try{
+			showToastClient(msg);
+		}
+		catch(err){
+			alert(msg);
+		}
+		return false;
+	 }
+         if(pwd!=pwd2)
+         {
+            msg = '两次密码不相同';
+            try{
+                showToastClient(msg);
+                }
+                catch(err){
+                    alert(msg);
+                    }
+             return false;
+         }
+         var nick = $("input[name=nickname]").val();
+	 if (nick.length <= 0){
+		 msg = '昵称不能为空';
+		 try{
+			 showToastClient(msg);
+		 }
+		 catch(err){
+			 alert(msg);
+		 }
+		 return false;
+	 }
+         if(nick == null || nick.length<2 || nick.length>16)
+         {
+            msg = '昵称长度需为2~16位';
+             try{
+                showToastClient(msg);
+                }
+                catch(err){
+                    alert(msg);
+                    }
+             return false;
+	 }
+	url ="/checknickname?nickname="+nick;
+	$.getJSON(url,function(resp){
+	if(resp.resp == "1")
+	{
+	try{
+		showToastClient("昵称已存在");
+	}
+	catch(err){
+		alert("昵称已存在");
+	}
+	return false;
+	}
+    return true;
+	});
+        pwd=null;
+        pwd2=null;
+        nick=null;
+        email=null;
+        emailStr=null;
+      //   return true;
+    }
+function fixEmail(){
+	}
+$(document).ready(function(){
+	$("input[type=radio]").click(function(){
+        $("label").each(function(){ $(this).css({"background-image":"url({{context['cdn']}}/images/radio_n.png)"}); $(this).children("input").removeAttr("name"); });
+        $(this).parent("label").css({"background-image":"url({{context['cdn']}}/images/radio_y.png)"});
+        $(this).attr("name","sex");
+
+        });
+    if('{{sex}}'=='1')
+    {
+    $(".radiom1").css({"background-image":"url({{context['cdn']}}/images/radio_y.png)"});
+    $(".radiom1").children().attr("name","sex");
+    }
+    else
+    {
+    $(".radiom0").css({"background-image":"url({{context['cdn']}}/images/radio_y.png)"});
+    $(".radiom0").children().attr("name","sex");
+    }
+
+    if('{{message}}'!='None')
+    {
+        try{
+            showToastClient('{{message}}');
+            }
+            catch(err){
+                alert('{{message}}');
+                }
+    }
+   });
+$(document).ready(function(){
+$(".passwdsign").click(function(){
+	var email = $.trim($("#email").val()).toLowerCase();
+        $("#email").val(email.replace("＠", "@"));
+        $("#email").val($("#email").val().replace("﹫", "@"));
+        $("#email").val($("#email").val().replace("。", "."));
+
+        var msg='';
+        var emailStr = $("input[name=email]").val();
+	if(emailStr.length <= 0){
+		msg='邮箱不能为空'
+		try{
+			showToastClient(msg);
+		}
+		catch(err){
+			alert(msg);
+		}
+		return false;
+	}
+        //var emailPat = /^(.+)@(.+)$/;
+	var emailPat =  /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$/;
+        var matchArray = emailStr.match(emailPat);
+	          if(matchArray==null){
+             msg = '邮箱格式有误';
+            try{
+                showToastClient(msg);
+                }
+                catch(err){
+                    alert(msg);
+
+                    }
+             return false;
+         }
+         
+			});
+$(".namesign").click(function(){
+	 var pwd = $("input[name=password]").val();
+         var pwd2 = $("input[name=password2]").val();
+	 if(pwd.length <= 0){
+		 msg = '密码不能为空';
+		 try{
+			showToastClient(msg);
+		 }
+		 catch(err){
+			 alert(msg);
+		 }
+		 return false;
+	 }
+	 if(pwd.length < 6 || pwd.length > 20){
+		msg = '密码为6-20位字母或数字';
+		try{
+			showToastClient(msg);
+		}
+		catch(err){
+			alert(msg);
+		}
+		return false;
+	 }
+         if(pwd!=pwd2)
+         {
+            msg = '两次密码不相同';
+            try{
+                showToastClient(msg);
+                }
+                catch(err){
+                    alert(msg);
+                    }
+             return false;
+         }
+
+				});
+$(".sexsign").click(function(){
+	 var nick = $("input[name=nickname]").val();
+	 if (nick.length <= 0){
+		 msg = '昵称不能为空';
+		 try{
+			 showToastClient(msg);
+		 }
+		 catch(err){
+			 alert(msg);
+		 }
+		 return false;
+	 }
+         if(nick.length<2 || nick.length>16)
+         {
+            msg = '昵称长度需为2~16位';
+             try{
+                showToastClient(msg);
+                }
+                catch(err){
+                    alert(msg);
+                    }
+             return false;
+	 }
+
+	url ="/checknickname?nickname="+nick;
+	$.getJSON(url,function(resp){
+	if(resp.resp == "1")
+	{
+	try{
+		showToastClient("昵称已存在");
+	}
+	catch(err){
+		alert("昵称已存在");
+	}
+	}
+	return false;
+	});
+	});
+});
+</script>
+{% end %}
+{% block location %}
+{% end %}
+{% block header %}
+<h1 id="header"><a class="toBack" href="/login?next={{referer}}#t1:7#t0:1">返 回</a>注册</h1>
+{% end %}
+
+{% block body %}
+<form method="POST" onSubmit="return checkForm()" class="form">
+    {{ xsrf_form_html() }}
+    <ul class="login pd_b">
+        <li><input type="hidden" name="referer" value="{{referer}}" /></li>
+        <li class="mailsign"><dl><dd><input type="text" name="email" id="email" value="{{email}}" placeholder="输入您常用的邮箱" class="inputshow" required="required" /></dd></dl></li>
+        <li class="passwdsign"><dl><dd><input type="password" name="password" value="{{password}}" placeholder="密码 6-20长度的字母或数字" class="inputshow" required="required" /></dd></dl></li>
+        <li class="passwdsign"><dl><dd><input type="password" name="password2" value="{{password2}}" placeholder="再次输入密码" class="inputshow" /></dd></dl></li>
+        <li class="namesign"><dl><dd><input type="text" name="nickname" value="{{nickname}}" placeholder="昵称" class="inputshow" required="required" /></dd></dl></li>
+        <input type="hidden" name="sex2" value={{sex}} />
+        <li class="sexsign"><dl><dt>性别</dt><dd class="tr">
+            <label class='radiom1'><input type="radio" value="1" />男</label>
+            <label class='radiom0'><input type="radio" value="0" />女</label>
+                </dd></dl></li>
+        <li><input type="submit" value="注  册" /></li>
+    </ul>
+</form>
+
+{% end %}

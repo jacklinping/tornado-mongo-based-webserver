@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript">
+
+</script>
+{% end %}
+
+
+{% block body %}
+<div class="main">
+    {% if current_cate %}
+    <div>
+        <span style="float:left;"><h3>{{current_cate['name']}}</h3></span>
+<!--        <span style="float:right;"><a class="button primary green" href="/apk/upload/{{current_cate['_id']}}?type={{type}}">上传动态</a></span>-->
+        <div style="clear:both;"></div>
+    </div>
+    {% end %}
+
+    <table>
+        <tbody border="0">
+            <tr style="font-weight:bold">
+                <td>图标</td>
+                <td>名字</td>
+                <td>包名</td>
+                <td>版本</td>
+                <td>操作</td>
+                <td></td>
+                <td>日期</td>
+            </tr>
+        {% for item in apklist %}
+                <tr>
+                    <td><img width=32 height=32 src="/download/{{item['package_icon']}}?type=1"/></td>
+                    <td><a href="/apk/show/{{ item['_id'] }}">{{ item['name'] }}</a></td>
+                    <td><a href="/apk/show/{{ item['_id'] }}">{{ item['package_name'] }}</a></td>
+                    <td>{{ item['package_version'] }}</td>
+                    <td>
+                        <a href="/apk/modify/{{item['_id']}}?type={{type}}"><button type="button" class="button">更新</button></a>
+                    </td>
+                    <td>
+                        <a href="/apk/delete/{{item['_id']}}?type={{type}}"><button type="button" class="button">删除</button></a>
+                    </td>
+                    <td>{{ item['atime'] }}</td>
+                </tr>
+        {% end %}
+        </tbody>
+    </table>
+    <div class=page>
+        <a href="/live/home/{{ current_cate['_id'] }}/0">首页</a>
+        {% if front != None %}
+        <a href="/live/home/{{ current_cate['_id'] }}/{{ front }}">上一页</a>
+        {% end %}
+        <span>{{ page }}</span>
+        {% if end != None %}
+        <a href="/live/home/{{ current_cate['_id'] }}/{{ end }}">下一页</a>
+        {% end %}
+        {% if tail != None %}
+        <a href="/live/home/{{ current_cate['_id'] }}/{{ tail }}">尾页</a>
+        {% end %}
+
+    </div>
+</div>
+
+<div class="side">
+    <div class="side_inside">
+        <a class="button primary green" href="/live/create">创建分类</a>
+        <div style="border-bottom: 1px dashed #EEE; padding: 5px 0;"></div>
+        <ul>
+        {% for item in categorys %}
+
+            {% if current_cate and current_cate['_id'] == item['_id'] %}
+            <li style="font-weight: bold">
+            {% else %}
+            <li>
+            {% end %}
+
+            <a style="padding: 6px 20px;float: left" href="/live/home/{{item['_id']}}/0">
+                {{item['name']}}
+            </a>
+            <a style="float:right; margin-top: 2px;" class="button" href="/live/edit/{{item['_id']}}">编辑</a>
+            <div style="clear:both;"></div>
+            </li>
+        {% end %}
+        </ul>
+    </div>
+</div>
+
+{% end %}
